@@ -3,33 +3,48 @@ package com.maksk993.pexelsapp.presentation.screens
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import com.github.terrakok.cicerone.Router
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentTransaction
 import com.github.terrakok.cicerone.androidx.AppNavigator
+import com.github.terrakok.cicerone.androidx.FragmentScreen
 import com.maksk993.pexelsapp.R
 import com.maksk993.pexelsapp.databinding.ActivityMainBinding
-import com.maksk993.pexelsapp.presentation.navigation.CiceroneInstance
 import com.maksk993.pexelsapp.presentation.navigation.Screens
 
 class MainActivity : AppCompatActivity() {
-    private lateinit var binding: ActivityMainBinding
     private val viewModel: MainViewModel by viewModels()
-
-    private val router: Router = CiceroneInstance.router
-    private val navigatorHolder = CiceroneInstance.navigatorHolder
+    private lateinit var binding: ActivityMainBinding
     private lateinit var navigator: AppNavigator
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        installSplashScreen()
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         initBottomNavMenu()
         initNavigator()
+        viewModel.replaceScreen(Screens.Home())
     }
 
     private fun initNavigator() {
-        navigator = AppNavigator(this, binding.fragmentContainer.id)
-        router.replaceScreen(Screens.Home())
+        navigator = object : AppNavigator(this, binding.fragmentContainer.id) {
+            override fun setupFragmentTransaction(
+                screen: FragmentScreen,
+                fragmentTransaction: FragmentTransaction,
+                currentFragment: Fragment?,
+                nextFragment: Fragment
+            ) {
+                super.setupFragmentTransaction(screen, fragmentTransaction, currentFragment, nextFragment)
+                fragmentTransaction.setCustomAnimations(
+                    R.anim.slide_in,
+                    R.anim.fade_out,
+                    R.anim.fade_in,
+                    R.anim.slide_out
+                )
+            }
+        }
     }
 
     private fun initBottomNavMenu() {
@@ -38,11 +53,11 @@ class MainActivity : AppCompatActivity() {
             setOnNavigationItemSelectedListener {
                 when (it.itemId) {
                     R.id.nav_home -> {
-                        router.replaceScreen(Screens.Home())
+                        viewModel.replaceScreen(Screens.Home())
                         return@setOnNavigationItemSelectedListener true
                     }
                     R.id.nav_bookmarks -> {
-                        router.replaceScreen(Screens.Bookmarks())
+                        viewModel.replaceScreen(Screens.Bookmarks())
                         return@setOnNavigationItemSelectedListener true
                     }
                 }
@@ -53,11 +68,11 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResumeFragments() {
         super.onResumeFragments()
-        navigatorHolder.setNavigator(navigator)
+        viewModel.navigatorHolder.setNavigator(navigator)
     }
 
     override fun onPause() {
-        navigatorHolder.removeNavigator()
+        viewModel.navigatorHolder.removeNavigator()
         super.onPause()
     }
 }

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/tv_item"
+    android:layout_width="wrap_content"
+    android:layout_height="40dp"
+    android:fontFamily="@font/mulish"
+    android:text=""
+    android:textSize="14sp"
+    android:textColor="@color/black"
+    android:gravity="center"
+    android:background="@drawable/bg_featured"
+    android:layout_marginEnd="8dp"
+    android:paddingStart="24dp"
+    android:paddingEnd="24dp"
+    />

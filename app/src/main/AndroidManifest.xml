@@ -17,6 +17,7 @@
         <activity
             android:name=".presentation.screens.MainActivity"
             android:exported="true"
+            android:theme="@style/Theme.PexelsApp.SplashScreen"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
