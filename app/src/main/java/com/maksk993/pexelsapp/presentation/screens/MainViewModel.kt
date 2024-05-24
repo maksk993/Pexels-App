@@ -9,6 +9,8 @@ class MainViewModel : ViewModel() {
     private val router: Router = CiceroneInstance.router
     val navigatorHolder = CiceroneInstance.navigatorHolder
 
-    fun replaceScreen(screen: Screen) = router.replaceScreen(screen)
+    fun replaceScreen(screen: Screen) {
+        router.replaceScreen(screen)
+    }
 
 }

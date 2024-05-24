@@ -1,6 +1,7 @@
 package com.maksk993.pexelsapp.presentation.screens
 
 import android.os.Bundle
+import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -25,7 +26,8 @@ class MainActivity : AppCompatActivity() {
 
         initBottomNavMenu()
         initNavigator()
-        viewModel.replaceScreen(Screens.Home())
+
+        if (savedInstanceState == null) viewModel.replaceScreen(Screens.Home())
     }
 
     private fun initNavigator() {

@@ -19,7 +19,7 @@ class FeaturedAdapter(private val context: Context, private var items: List<Stri
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FeaturedViewHolder {
-        return FeaturedViewHolder(LayoutInflater.from(context).inflate(R.layout.featured_item, parent, false))
+        return FeaturedViewHolder(LayoutInflater.from(context).inflate(R.layout.item_featured, parent, false))
     }
 
     override fun getItemCount(): Int = items.size
