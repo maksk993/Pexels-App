@@ -5,8 +5,9 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.maksk993.pexelsapp.R
+import com.maksk993.pexelsapp.domain.models.Title
 
-class FeaturedAdapter(private val context: Context, private var items: List<String>): RecyclerView.Adapter<FeaturedViewHolder>() {
+class FeaturedAdapter(private val context: Context, private var items: List<Title>): RecyclerView.Adapter<FeaturedViewHolder>() {
     private lateinit var listener: OnItemClickListener
     private var selectedItem = -1
 
@@ -25,7 +26,7 @@ class FeaturedAdapter(private val context: Context, private var items: List<Stri
     override fun getItemCount(): Int = items.size
 
     override fun onBindViewHolder(holder: FeaturedViewHolder, position: Int) {
-        holder.text.text = items[holder.adapterPosition]
+        holder.text.text = items[holder.adapterPosition].title
         holder.itemView.setOnClickListener{
             listener.onItemClick(holder.adapterPosition)
             selectedItem = holder.adapterPosition

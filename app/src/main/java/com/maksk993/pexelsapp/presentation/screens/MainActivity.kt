@@ -1,7 +1,6 @@
 package com.maksk993.pexelsapp.presentation.screens
 
 import android.os.Bundle
-import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -12,6 +11,7 @@ import com.github.terrakok.cicerone.androidx.FragmentScreen
 import com.maksk993.pexelsapp.R
 import com.maksk993.pexelsapp.databinding.ActivityMainBinding
 import com.maksk993.pexelsapp.presentation.navigation.Screens
+
 
 class MainActivity : AppCompatActivity() {
     private val viewModel: MainViewModel by viewModels()
@@ -28,6 +28,11 @@ class MainActivity : AppCompatActivity() {
         initNavigator()
 
         if (savedInstanceState == null) viewModel.replaceScreen(Screens.Home())
+    }
+
+    override fun onStart() {
+        super.onStart()
+        viewModel.getFeaturedTitles()
     }
 
     private fun initNavigator() {

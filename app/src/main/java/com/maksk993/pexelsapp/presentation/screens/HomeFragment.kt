@@ -11,6 +11,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.maksk993.pexelsapp.R
 import com.maksk993.pexelsapp.databinding.FragmentHomeBinding
+import com.maksk993.pexelsapp.domain.models.Photo
+import com.maksk993.pexelsapp.domain.models.Title
 import com.maksk993.pexelsapp.presentation.models.FeaturedAdapter
 import com.maksk993.pexelsapp.presentation.models.PhotosAdapter
 import com.maksk993.pexelsapp.presentation.navigation.Screens
@@ -21,9 +23,9 @@ class HomeFragment : Fragment() {
     private lateinit var binding: FragmentHomeBinding
 
     private lateinit var featuredAdapter: FeaturedAdapter
-    private val featuredItems: MutableList<String> = ArrayList()
+    private val featuredItems: MutableList<Title> = ArrayList()
     private lateinit var photosAdapter: PhotosAdapter
-    private val photosItems: MutableList<Int> = ArrayList()
+    private val photosItems: MutableList<Photo> = ArrayList()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -34,21 +36,25 @@ class HomeFragment : Fragment() {
         initSearchView()
         initFeaturedRv()
         initPhotosRv()
+        initObservers()
 
         return binding.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        addItemToFeatured("Ice")
-        addItemToFeatured("Watches")
-        addItemToFeatured("Drawing")
-        addItemToFeatured("Something")
-        addItemToFeatured("Else")
-        addItemToFeatured("Test")
-        addItemToFeatured("Recycler")
+    private fun initObservers() {
+        viewModel.apply {
+           featuredTitles.observe(viewLifecycleOwner){
+                for (i in it){
+                    addItemToFeatured(i)
+                }
+            }
 
-        addItemToPhotos(R.drawable.a1)
+            photos.observe(viewLifecycleOwner){
+                for (i in it){
+                    addItemToPhotos(i)
+                }
+            }
+        }
     }
 
     private fun initSearchView() {
@@ -78,16 +84,23 @@ class HomeFragment : Fragment() {
             false
         )
         featuredAdapter = FeaturedAdapter(requireContext(), featuredItems)
+        featuredAdapter.setOnItemClickListener(object : FeaturedAdapter.OnItemClickListener{
+            override fun onItemClick(position: Int) {
+                viewModel.getPhotos(featuredItems[position])
+            }
+        })
         binding.rvFeatured.adapter = featuredAdapter
     }
 
-    private fun addItemToPhotos(image: Int){
-        photosItems.add(image)
+    private fun addItemToPhotos(photo: Photo){
+        if (photosItems.contains(photo)) return
+        photosItems.add(photo)
         photosAdapter.notifyItemInserted(photosItems.size)
     }
 
-    private fun addItemToFeatured(text: String){
-        featuredItems.add(text)
+    private fun addItemToFeatured(title: Title){
+        if (featuredItems.contains(title)) return
+        featuredItems.add(title)
         featuredAdapter.notifyItemInserted(featuredItems.size)
     }
 

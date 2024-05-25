@@ -39,14 +39,19 @@ android {
 }
 
 dependencies {
-    implementation("com.github.terrakok:cicerone:7.1")
-
     implementation("androidx.fragment:fragment-ktx:1.7.0")
 
+    // Cicerone
+    implementation("com.github.terrakok:cicerone:7.1")
+    // Splash Screen
     implementation("androidx.core:core-splashscreen:1.0.1")
-
+    // Glide
     implementation("com.github.bumptech.glide:glide:4.16.0")
 
+    // Gson Converter
+    implementation ("com.squareup.retrofit2:converter-gson:2.11.0")
+    // Okhttp
+    implementation ("com.squareup.okhttp3:okhttp:4.12.0")
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

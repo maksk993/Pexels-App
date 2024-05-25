@@ -5,10 +5,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.maksk993.pexelsapp.R
+import com.maksk993.pexelsapp.domain.models.Photo
 
 class PhotosAdapter(private val context: Context,
-                    private var items: List<Int>,
+                    private var items: List<Photo>,
                     private val setVisibilityGone: Boolean = false)
     : RecyclerView.Adapter<PhotosViewHolder>()
 {
@@ -29,8 +32,13 @@ class PhotosAdapter(private val context: Context,
     override fun getItemCount(): Int = items.size
 
     override fun onBindViewHolder(holder: PhotosViewHolder, position: Int) {
-        holder.image.setImageResource(items[position])
+        Glide.with(context)
+            .load(items[position].url)
+            .placeholder(R.drawable.placeholder)
+            .into(holder.image)
+
         if (setVisibilityGone) holder.text.visibility = View.GONE
+
         holder.itemView.setOnClickListener{
             listener.onItemClick(holder.adapterPosition)
         }
