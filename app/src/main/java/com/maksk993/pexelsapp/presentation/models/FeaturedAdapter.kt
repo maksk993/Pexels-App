@@ -5,9 +5,9 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.maksk993.pexelsapp.R
-import com.maksk993.pexelsapp.domain.models.Title
+import com.maksk993.pexelsapp.domain.models.Collection
 
-class FeaturedAdapter(private val context: Context, private var items: List<Title>): RecyclerView.Adapter<FeaturedViewHolder>() {
+class FeaturedAdapter(private val context: Context, private var items: List<Collection>): RecyclerView.Adapter<FeaturedViewHolder>() {
     private lateinit var listener: OnItemClickListener
     private var selectedItem = -1
 

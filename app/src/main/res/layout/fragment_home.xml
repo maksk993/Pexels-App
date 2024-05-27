@@ -47,6 +47,74 @@
         android:layout_marginStart="16dp"
         />
 
+    <LinearLayout
+        android:id="@+id/stub"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/search_view"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:background="@color/white"
+        android:visibility="gone"
+        >
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_gravity="center"
+            android:text="@string/no_results"
+            android:fontFamily="@font/mulish"
+            android:textColor="@color/black"
+            android:textSize="14sp"
+            />
+
+        <TextView
+            android:id="@+id/explore"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/explore"
+            android:fontFamily="@font/mulish_bold"
+            android:textColor="@color/red"
+            android:textSize="16sp"
+            android:layout_marginTop="24dp"
+            />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/network_stub"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/search_view"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:background="@color/white"
+        android:visibility="gone"
+        >
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:src="@drawable/wifi"
+            android:layout_gravity="center"
+            />
+
+        <TextView
+            android:id="@+id/try_again"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/try_again"
+            android:fontFamily="@font/mulish_bold"
+            android:textColor="@color/red"
+            android:textSize="16sp"
+            android:layout_marginTop="24dp"
+            />
+
+    </LinearLayout>
+
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/top_guideline"
         android:layout_width="0dp"

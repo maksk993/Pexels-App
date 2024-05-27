@@ -33,7 +33,7 @@ class PhotosAdapter(private val context: Context,
 
     override fun onBindViewHolder(holder: PhotosViewHolder, position: Int) {
         Glide.with(context)
-            .load(items[position].url)
+            .load(items[position].src.original)
             .placeholder(R.drawable.placeholder)
             .into(holder.image)
 

@@ -6,16 +6,21 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.appcompat.widget.SearchView.OnQueryTextListener
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.maksk993.pexelsapp.R
 import com.maksk993.pexelsapp.databinding.FragmentHomeBinding
 import com.maksk993.pexelsapp.domain.models.Photo
-import com.maksk993.pexelsapp.domain.models.Title
+import com.maksk993.pexelsapp.domain.models.Collection
 import com.maksk993.pexelsapp.presentation.models.FeaturedAdapter
+import com.maksk993.pexelsapp.presentation.models.FeaturedViewHolder
 import com.maksk993.pexelsapp.presentation.models.PhotosAdapter
 import com.maksk993.pexelsapp.presentation.navigation.Screens
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.util.ArrayList
 
 class HomeFragment : Fragment() {
@@ -23,7 +28,7 @@ class HomeFragment : Fragment() {
     private lateinit var binding: FragmentHomeBinding
 
     private lateinit var featuredAdapter: FeaturedAdapter
-    private val featuredItems: MutableList<Title> = ArrayList()
+    private val featuredItems: MutableList<Collection> = ArrayList()
     private lateinit var photosAdapter: PhotosAdapter
     private val photosItems: MutableList<Photo> = ArrayList()
 
@@ -36,22 +41,44 @@ class HomeFragment : Fragment() {
         initSearchView()
         initFeaturedRv()
         initPhotosRv()
-        initObservers()
+        initStub()
+        initNetworkStub()
 
         return binding.root
+    }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        initObservers()
+        viewModel.getPhotos()
     }
 
     private fun initObservers() {
         viewModel.apply {
-           featuredTitles.observe(viewLifecycleOwner){
+           featuredCollections.observe(viewLifecycleOwner){
                 for (i in it){
                     addItemToFeatured(i)
                 }
             }
 
             photos.observe(viewLifecycleOwner){
-                for (i in it){
-                    addItemToPhotos(i)
+                with(binding) {
+                    if (it == null) {
+                        rvPhotos.visibility = View.GONE
+                        stub.visibility = View.GONE
+                        networkStub.visibility = View.VISIBLE
+                    }
+                    else if (it.isEmpty()) {
+                        rvPhotos.visibility = View.GONE
+                        networkStub.visibility = View.GONE
+                        stub.visibility = View.VISIBLE
+                    } else {
+                        stub.visibility = View.GONE
+                        networkStub.visibility = View.GONE
+                        rvPhotos.visibility = View.VISIBLE
+                        for (i in it) {
+                            addItemToPhotos(i)
+                        }
+                    }
                 }
             }
         }
@@ -62,6 +89,18 @@ class HomeFragment : Fragment() {
             typeface = resources.getFont(R.font.mulish)
             textSize = 15F
         }
+
+        binding.searchView.setOnQueryTextListener(object : OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                query?.let {
+                    clearRv()
+                    viewModel.getPhotos(Collection(query))
+                }
+                return true
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean = true
+        })
     }
 
     private fun initPhotosRv() {
@@ -71,6 +110,7 @@ class HomeFragment : Fragment() {
         photosAdapter = PhotosAdapter(requireContext(), photosItems, true)
         photosAdapter.setOnItemClickListener(object : PhotosAdapter.OnItemClickListener{
             override fun onItemClick(position: Int) {
+                viewModel.setFocusedPhoto(photosItems[position])
                 viewModel.replaceScreen(Screens.Details())
             }
         })
@@ -86,10 +126,15 @@ class HomeFragment : Fragment() {
         featuredAdapter = FeaturedAdapter(requireContext(), featuredItems)
         featuredAdapter.setOnItemClickListener(object : FeaturedAdapter.OnItemClickListener{
             override fun onItemClick(position: Int) {
-                viewModel.getPhotos(featuredItems[position])
+                binding.searchView.setQuery(featuredItems[position].title, true)
             }
         })
         binding.rvFeatured.adapter = featuredAdapter
+    }
+
+    private fun clearRv() {
+        photosItems.clear()
+        photosAdapter.notifyDataSetChanged()
     }
 
     private fun addItemToPhotos(photo: Photo){
@@ -98,10 +143,28 @@ class HomeFragment : Fragment() {
         photosAdapter.notifyItemInserted(photosItems.size)
     }
 
-    private fun addItemToFeatured(title: Title){
-        if (featuredItems.contains(title)) return
-        featuredItems.add(title)
+    private fun addItemToFeatured(collection: Collection){
+        if (featuredItems.contains(collection)) return
+        featuredItems.add(collection)
         featuredAdapter.notifyItemInserted(featuredItems.size)
+    }
+
+    private fun initStub() {
+        with(binding) {
+            explore.setOnClickListener{
+                viewModel.getPhotos()
+                searchView.setQuery("", false)
+            }
+        }
+    }
+
+    private fun initNetworkStub(){
+        with(binding) {
+            tryAgain.setOnClickListener{
+                if (searchView.query.toString().isEmpty()) viewModel.getPhotos()
+                else viewModel.getPhotos(Collection(searchView.query.toString()))
+            }
+        }
     }
 
 }

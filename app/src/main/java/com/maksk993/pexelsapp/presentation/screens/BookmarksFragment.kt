@@ -7,7 +7,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
-import com.maksk993.pexelsapp.R
 import com.maksk993.pexelsapp.databinding.FragmentBookmarksBinding
 import com.maksk993.pexelsapp.domain.models.Photo
 import com.maksk993.pexelsapp.presentation.models.PhotosAdapter

@@ -32,7 +32,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
-        viewModel.getFeaturedTitles()
+        viewModel.getFeaturedCollections()
     }
 
     private fun initNavigator() {

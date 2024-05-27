@@ -1,5 +1,5 @@
 package com.maksk993.pexelsapp.domain.models
 
 interface PhotoCallback {
-    fun call(photo: Photo)
+    fun call(photos: List<Photo>?)
 }
