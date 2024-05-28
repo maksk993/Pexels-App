@@ -1,21 +1,21 @@
-package com.maksk993.pexelsapp.presentation.models
+package com.maksk993.pexelsapp.presentation.models.recyclerview
 
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.maksk993.pexelsapp.R
 import com.maksk993.pexelsapp.domain.models.Photo
+import com.maksk993.pexelsapp.presentation.models.GlideInstance
+import javax.inject.Inject
 
-class PhotosAdapter(private val context: Context,
-                    private var items: List<Photo>,
-                    private val setVisibilityGone: Boolean = false)
-    : RecyclerView.Adapter<PhotosViewHolder>()
-{
-    private lateinit var listener: PhotosAdapter.OnItemClickListener
+class PhotosAdapter @Inject constructor(
+    val context: Context,
+    var items: MutableList<Photo>,
+) : RecyclerView.Adapter<PhotosViewHolder>() {
+    private lateinit var listener: OnItemClickListener
+    var setVisibilityGone: Boolean = false
 
     interface OnItemClickListener {
         fun onItemClick(position: Int)
@@ -32,13 +32,9 @@ class PhotosAdapter(private val context: Context,
     override fun getItemCount(): Int = items.size
 
     override fun onBindViewHolder(holder: PhotosViewHolder, position: Int) {
-        Glide.with(context)
-            .load(items[position].src.original)
-            .placeholder(R.drawable.placeholder)
-            .into(holder.image)
+        GlideInstance.loadImage(context, items[position].src.original, holder.image)
 
         if (setVisibilityGone) holder.text.visibility = View.GONE
-
         holder.itemView.setOnClickListener{
             listener.onItemClick(holder.adapterPosition)
         }

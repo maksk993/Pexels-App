@@ -1,4 +1,4 @@
-package com.maksk993.pexelsapp.presentation.screens
+package com.maksk993.pexelsapp.presentation.screens.vm
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -6,8 +6,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.terrakok.cicerone.Router
 import com.github.terrakok.cicerone.Screen
-import com.maksk993.pexelsapp.data.repository.PhotoRepositoryImpl
-import com.maksk993.pexelsapp.data.repository.CollectionRepositoryImpl
 import com.maksk993.pexelsapp.domain.models.Photo
 import com.maksk993.pexelsapp.domain.models.PhotoCallback
 import com.maksk993.pexelsapp.domain.models.Collection
@@ -17,16 +15,33 @@ import com.maksk993.pexelsapp.domain.usecases.GetFeaturedCollections
 import com.maksk993.pexelsapp.presentation.navigation.CiceroneInstance
 import kotlinx.coroutines.launch
 
-class MainViewModel : ViewModel() {
+class MainViewModel(
+    private val getFeaturedCollections: GetFeaturedCollections,
+    private val getPhotos: GetCuratedPhotos
+) : ViewModel() {
     private val router: Router = CiceroneInstance.router
     val navigatorHolder = CiceroneInstance.navigatorHolder
 
+    private val _currentFragment: MutableLiveData<String> = MutableLiveData()
+    val currentFragment: LiveData<String> = _currentFragment
+
     fun replaceScreen(screen: Screen) {
+        if (screen.screenKey == _currentFragment.value) return
         router.replaceScreen(screen)
+        _currentFragment.value = screen.screenKey
     }
 
-    private val getFeaturedCollections = GetFeaturedCollections(CollectionRepositoryImpl())
-    private val getPhotos = GetCuratedPhotos(PhotoRepositoryImpl())
+    fun navigateToScreen(screen: Screen) {
+        if (screen.screenKey == _currentFragment.value) return
+        router.navigateTo(screen)
+        _currentFragment.value = screen.screenKey
+    }
+
+    fun backToScreen(screen: Screen) {
+        if (screen.screenKey == _currentFragment.value) return
+        router.backTo(screen)
+        _currentFragment.value = screen.screenKey
+    }
 
     private val _featuredCollections: MutableLiveData<MutableList<Collection>> = MutableLiveData(ArrayList())
     val featuredCollections: LiveData<MutableList<Collection>> = _featuredCollections

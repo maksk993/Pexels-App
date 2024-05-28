@@ -1,18 +1,31 @@
-package com.maksk993.pexelsapp.presentation.screens
+package com.maksk993.pexelsapp.presentation.screens.fragments
 
+import android.content.Context
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
-import com.bumptech.glide.Glide
+import com.maksk993.pexelsapp.app.App
 import com.maksk993.pexelsapp.databinding.FragmentDetailsBinding
+import com.maksk993.pexelsapp.presentation.models.GlideInstance
 import com.maksk993.pexelsapp.presentation.navigation.Screens
+import com.maksk993.pexelsapp.presentation.screens.vm.MainViewModel
+import com.maksk993.pexelsapp.presentation.screens.vm.MainViewModelFactory
+import javax.inject.Inject
 
 class DetailsFragment : Fragment() {
-    private val viewModel: MainViewModel by activityViewModels()
+    @Inject
+    lateinit var viewModelFactory: MainViewModelFactory
+    private val viewModel: MainViewModel by activityViewModels { viewModelFactory }
+
     private lateinit var binding: FragmentDetailsBinding
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        (requireActivity().applicationContext as App).appComponent.inject(this)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -32,17 +45,14 @@ class DetailsFragment : Fragment() {
 
     private fun initObservers() {
         viewModel.focusedPhoto.observe(viewLifecycleOwner){
-            Glide.with(requireContext())
-                 .load(it.src.original)
-                 .into(binding.image)
-
+            GlideInstance.loadImage(requireContext(), it.src.original, binding.image)
             binding.headerTitle.text = it.photographer
         }
     }
 
     private fun initButtons() {
         binding.btnBack.setOnClickListener{
-            viewModel.replaceScreen(Screens.Home())
+            viewModel.backToScreen(Screens.Home())
         }
     }
 

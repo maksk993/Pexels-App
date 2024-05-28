@@ -1,36 +1,45 @@
-package com.maksk993.pexelsapp.presentation.screens
+package com.maksk993.pexelsapp.presentation.screens.fragments
 
+import android.content.Context
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.widget.SearchView.OnQueryTextListener
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.maksk993.pexelsapp.R
+import com.maksk993.pexelsapp.app.App
 import com.maksk993.pexelsapp.databinding.FragmentHomeBinding
 import com.maksk993.pexelsapp.domain.models.Photo
 import com.maksk993.pexelsapp.domain.models.Collection
-import com.maksk993.pexelsapp.presentation.models.FeaturedAdapter
-import com.maksk993.pexelsapp.presentation.models.FeaturedViewHolder
-import com.maksk993.pexelsapp.presentation.models.PhotosAdapter
+import com.maksk993.pexelsapp.presentation.models.recyclerview.FeaturedAdapter
+import com.maksk993.pexelsapp.presentation.models.recyclerview.PhotosAdapter
 import com.maksk993.pexelsapp.presentation.navigation.Screens
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import java.util.ArrayList
+import com.maksk993.pexelsapp.presentation.screens.vm.MainViewModel
+import com.maksk993.pexelsapp.presentation.screens.vm.MainViewModelFactory
+import javax.inject.Inject
 
 class HomeFragment : Fragment() {
-    private val viewModel: MainViewModel by activityViewModels()
+    @Inject
+    lateinit var viewModelFactory: MainViewModelFactory
+    private val viewModel: MainViewModel by activityViewModels { viewModelFactory }
+
     private lateinit var binding: FragmentHomeBinding
 
-    private lateinit var featuredAdapter: FeaturedAdapter
-    private val featuredItems: MutableList<Collection> = ArrayList()
-    private lateinit var photosAdapter: PhotosAdapter
-    private val photosItems: MutableList<Photo> = ArrayList()
+    @Inject
+    lateinit var featuredAdapter: FeaturedAdapter
+    @Inject
+    lateinit var photosAdapter: PhotosAdapter
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        (requireActivity().applicationContext as App).appComponent.inject(this)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -63,6 +72,7 @@ class HomeFragment : Fragment() {
             photos.observe(viewLifecycleOwner){
                 with(binding) {
                     if (it == null) {
+                        Toast.makeText(context, "Check your internet connection", Toast.LENGTH_SHORT).show()
                         rvPhotos.visibility = View.GONE
                         stub.visibility = View.GONE
                         networkStub.visibility = View.VISIBLE
@@ -71,7 +81,8 @@ class HomeFragment : Fragment() {
                         rvPhotos.visibility = View.GONE
                         networkStub.visibility = View.GONE
                         stub.visibility = View.VISIBLE
-                    } else {
+                    }
+                    else {
                         stub.visibility = View.GONE
                         networkStub.visibility = View.GONE
                         rvPhotos.visibility = View.VISIBLE
@@ -107,11 +118,11 @@ class HomeFragment : Fragment() {
         binding.rvPhotos.layoutManager = StaggeredGridLayoutManager(
             2, StaggeredGridLayoutManager.VERTICAL
         )
-        photosAdapter = PhotosAdapter(requireContext(), photosItems, true)
+        photosAdapter.setVisibilityGone = true
         photosAdapter.setOnItemClickListener(object : PhotosAdapter.OnItemClickListener{
             override fun onItemClick(position: Int) {
-                viewModel.setFocusedPhoto(photosItems[position])
-                viewModel.replaceScreen(Screens.Details())
+                viewModel.setFocusedPhoto(photosAdapter.items[position])
+                viewModel.navigateToScreen(Screens.Details())
             }
         })
         binding.rvPhotos.adapter = photosAdapter
@@ -123,30 +134,30 @@ class HomeFragment : Fragment() {
             LinearLayoutManager.HORIZONTAL,
             false
         )
-        featuredAdapter = FeaturedAdapter(requireContext(), featuredItems)
+       // featuredAdapter = FeaturedAdapter(requireContext(), featuredItems)
         featuredAdapter.setOnItemClickListener(object : FeaturedAdapter.OnItemClickListener{
             override fun onItemClick(position: Int) {
-                binding.searchView.setQuery(featuredItems[position].title, true)
+                binding.searchView.setQuery(featuredAdapter.items[position].title, true)
             }
         })
         binding.rvFeatured.adapter = featuredAdapter
     }
 
     private fun clearRv() {
-        photosItems.clear()
+        photosAdapter.items.clear()
         photosAdapter.notifyDataSetChanged()
     }
 
     private fun addItemToPhotos(photo: Photo){
-        if (photosItems.contains(photo)) return
-        photosItems.add(photo)
-        photosAdapter.notifyItemInserted(photosItems.size)
+        if (photosAdapter.items.contains(photo)) return
+        photosAdapter.items.add(photo)
+        photosAdapter.notifyItemInserted(photosAdapter.items.size)
     }
 
     private fun addItemToFeatured(collection: Collection){
-        if (featuredItems.contains(collection)) return
-        featuredItems.add(collection)
-        featuredAdapter.notifyItemInserted(featuredItems.size)
+        if (featuredAdapter.items.contains(collection)) return
+        featuredAdapter.items.add(collection)
+        featuredAdapter.notifyItemInserted(featuredAdapter.items.size)
     }
 
     private fun initStub() {
@@ -161,6 +172,7 @@ class HomeFragment : Fragment() {
     private fun initNetworkStub(){
         with(binding) {
             tryAgain.setOnClickListener{
+                viewModel.getFeaturedCollections()
                 if (searchView.query.toString().isEmpty()) viewModel.getPhotos()
                 else viewModel.getPhotos(Collection(searchView.query.toString()))
             }

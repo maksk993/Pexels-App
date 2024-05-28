@@ -1,4 +1,4 @@
-package com.maksk993.pexelsapp.presentation.models
+package com.maksk993.pexelsapp.presentation.models.recyclerview
 
 import android.view.View
 import android.widget.ImageView

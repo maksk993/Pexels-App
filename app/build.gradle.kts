@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
+    id("kotlin-kapt")
 }
 
 android {
@@ -40,6 +41,12 @@ android {
 
 dependencies {
     implementation("androidx.fragment:fragment-ktx:1.7.0")
+
+    // Dagger
+    implementation("com.google.dagger:dagger:2.51.1")
+    kapt("com.google.dagger:dagger-compiler:2.51.1")
+    implementation("javax.inject:javax.inject:1")
+
 
     // Cicerone
     implementation("com.github.terrakok:cicerone:7.1")

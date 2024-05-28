@@ -1,6 +1,7 @@
 package com.maksk993.pexelsapp.presentation.screens
 
 import android.os.Bundle
+import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -9,12 +10,19 @@ import androidx.fragment.app.FragmentTransaction
 import com.github.terrakok.cicerone.androidx.AppNavigator
 import com.github.terrakok.cicerone.androidx.FragmentScreen
 import com.maksk993.pexelsapp.R
+import com.maksk993.pexelsapp.app.App
 import com.maksk993.pexelsapp.databinding.ActivityMainBinding
 import com.maksk993.pexelsapp.presentation.navigation.Screens
+import com.maksk993.pexelsapp.presentation.screens.vm.MainViewModel
+import com.maksk993.pexelsapp.presentation.screens.vm.MainViewModelFactory
+import javax.inject.Inject
 
 
 class MainActivity : AppCompatActivity() {
-    private val viewModel: MainViewModel by viewModels()
+    @Inject
+    lateinit var viewModelFactory: MainViewModelFactory
+    private val viewModel: MainViewModel by viewModels { viewModelFactory }
+
     private lateinit var binding: ActivityMainBinding
     private lateinit var navigator: AppNavigator
 
@@ -23,6 +31,7 @@ class MainActivity : AppCompatActivity() {
         installSplashScreen()
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        (applicationContext as App).appComponent.inject(this)
 
         initBottomNavMenu()
         initNavigator()
@@ -33,6 +42,16 @@ class MainActivity : AppCompatActivity() {
     override fun onStart() {
         super.onStart()
         viewModel.getFeaturedCollections()
+        initObservers()
+    }
+
+    private fun initObservers() {
+        viewModel.currentFragment.observe(this){
+            if (it == Screens.Details().screenKey){
+                binding.bottomNavView.visibility = View.GONE
+            }
+            else binding.bottomNavView.visibility = View.VISIBLE
+        }
     }
 
     private fun initNavigator() {
@@ -60,11 +79,11 @@ class MainActivity : AppCompatActivity() {
             setOnNavigationItemSelectedListener {
                 when (it.itemId) {
                     R.id.nav_home -> {
-                        viewModel.replaceScreen(Screens.Home())
+                        viewModel.backToScreen(Screens.Home())
                         return@setOnNavigationItemSelectedListener true
                     }
                     R.id.nav_bookmarks -> {
-                        viewModel.replaceScreen(Screens.Bookmarks())
+                        viewModel.navigateToScreen(Screens.Bookmarks())
                         return@setOnNavigationItemSelectedListener true
                     }
                 }
@@ -82,4 +101,5 @@ class MainActivity : AppCompatActivity() {
         viewModel.navigatorHolder.removeNavigator()
         super.onPause()
     }
+
 }

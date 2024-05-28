@@ -1,4 +1,4 @@
-package com.maksk993.pexelsapp.presentation.models
+package com.maksk993.pexelsapp.presentation.models.recyclerview
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -6,8 +6,12 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.maksk993.pexelsapp.R
 import com.maksk993.pexelsapp.domain.models.Collection
+import javax.inject.Inject
 
-class FeaturedAdapter(private val context: Context, private var items: List<Collection>): RecyclerView.Adapter<FeaturedViewHolder>() {
+class FeaturedAdapter @Inject constructor(
+    val context: Context,
+    var items: MutableList<Collection>
+): RecyclerView.Adapter<FeaturedViewHolder>() {
     private lateinit var listener: OnItemClickListener
     private var selectedItem = -1
 
