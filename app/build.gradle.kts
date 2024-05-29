@@ -40,13 +40,14 @@ android {
 }
 
 dependencies {
-    implementation("androidx.fragment:fragment-ktx:1.7.0")
+
+    implementation(project(":domain"))
+    implementation(project(":data"))
 
     // Dagger
     implementation("com.google.dagger:dagger:2.51.1")
     kapt("com.google.dagger:dagger-compiler:2.51.1")
     implementation("javax.inject:javax.inject:1")
-
 
     // Cicerone
     implementation("com.github.terrakok:cicerone:7.1")
@@ -55,12 +56,7 @@ dependencies {
     // Glide
     implementation("com.github.bumptech.glide:glide:4.16.0")
 
-
-    // Okhttp
-    implementation ("com.squareup.okhttp3:okhttp:4.12.0")
-    // Gson
-    implementation ("com.google.code.gson:gson:2.10")
-
+    implementation("androidx.fragment:fragment-ktx:1.7.0")
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)

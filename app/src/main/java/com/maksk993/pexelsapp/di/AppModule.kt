@@ -1,13 +1,13 @@
 package com.maksk993.pexelsapp.di
 
 import android.content.Context
-import androidx.fragment.app.FragmentActivity
-import com.github.terrakok.cicerone.androidx.AppNavigator
 import com.maksk993.pexelsapp.domain.models.Collection
 import com.maksk993.pexelsapp.domain.models.Photo
+import com.maksk993.pexelsapp.domain.usecases.AddPhotoToBookmarks
 import com.maksk993.pexelsapp.domain.usecases.GetCuratedPhotos
 import com.maksk993.pexelsapp.domain.usecases.GetFeaturedCollections
-import com.maksk993.pexelsapp.presentation.screens.vm.MainViewModelFactory
+import com.maksk993.pexelsapp.domain.usecases.GetPhotosFromBookmarks
+import com.maksk993.pexelsapp.presentation.vm.MainViewModelFactory
 import dagger.Module
 import dagger.Provides
 
@@ -19,11 +19,15 @@ class AppModule(private val context: Context) {
     @Provides
     fun provideViewModelFactory(
         getCuratedPhotos: GetCuratedPhotos,
-        getFeaturedCollections: GetFeaturedCollections
+        getFeaturedCollections: GetFeaturedCollections,
+        addPhotoToBookmarks: AddPhotoToBookmarks,
+        getPhotosFromBookmarks: GetPhotosFromBookmarks
     ) : MainViewModelFactory {
         return MainViewModelFactory(
-            getPhotos = getCuratedPhotos,
-            getFeaturedCollections = getFeaturedCollections
+            getCuratedPhotos = getCuratedPhotos,
+            getFeaturedCollections = getFeaturedCollections,
+            addPhotoToBookmarks = addPhotoToBookmarks,
+            getPhotosFromBookmarks = getPhotosFromBookmarks
         )
     }
 

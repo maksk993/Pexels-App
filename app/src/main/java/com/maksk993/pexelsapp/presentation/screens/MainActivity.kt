@@ -13,8 +13,8 @@ import com.maksk993.pexelsapp.R
 import com.maksk993.pexelsapp.app.App
 import com.maksk993.pexelsapp.databinding.ActivityMainBinding
 import com.maksk993.pexelsapp.presentation.navigation.Screens
-import com.maksk993.pexelsapp.presentation.screens.vm.MainViewModel
-import com.maksk993.pexelsapp.presentation.screens.vm.MainViewModelFactory
+import com.maksk993.pexelsapp.presentation.vm.MainViewModel
+import com.maksk993.pexelsapp.presentation.vm.MainViewModelFactory
 import javax.inject.Inject
 
 
@@ -36,7 +36,7 @@ class MainActivity : AppCompatActivity() {
         initBottomNavMenu()
         initNavigator()
 
-        if (savedInstanceState == null) viewModel.replaceScreen(Screens.Home())
+        viewModel.setRootScreen(Screens.Home())
     }
 
     override fun onStart() {
@@ -100,6 +100,15 @@ class MainActivity : AppCompatActivity() {
     override fun onPause() {
         viewModel.navigatorHolder.removeNavigator()
         super.onPause()
+    }
+
+    override fun onBackPressed() {
+        if (viewModel.currentFragment.value == Screens.Home().screenKey)
+            super.onBackPressed()
+        else {
+            viewModel.backToScreen(Screens.Home())
+            binding.bottomNavView.menu.findItem(R.id.nav_home).isChecked = true
+        }
     }
 
 }

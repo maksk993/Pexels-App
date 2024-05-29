@@ -2,17 +2,17 @@ package com.maksk993.pexelsapp.presentation.screens.fragments
 
 import android.content.Context
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.maksk993.pexelsapp.app.App
 import com.maksk993.pexelsapp.databinding.FragmentDetailsBinding
 import com.maksk993.pexelsapp.presentation.models.GlideInstance
 import com.maksk993.pexelsapp.presentation.navigation.Screens
-import com.maksk993.pexelsapp.presentation.screens.vm.MainViewModel
-import com.maksk993.pexelsapp.presentation.screens.vm.MainViewModelFactory
+import com.maksk993.pexelsapp.presentation.vm.MainViewModel
+import com.maksk993.pexelsapp.presentation.vm.MainViewModelFactory
 import javax.inject.Inject
 
 class DetailsFragment : Fragment() {
@@ -51,8 +51,14 @@ class DetailsFragment : Fragment() {
     }
 
     private fun initButtons() {
-        binding.btnBack.setOnClickListener{
-            viewModel.backToScreen(Screens.Home())
+        binding.apply {
+            btnBack.setOnClickListener{
+                viewModel.backToScreen(Screens.Home())
+            }
+
+            btnAddToBookmarks.setOnClickListener {
+                viewModel.addPhotoToBookmarks()
+            }
         }
     }
 

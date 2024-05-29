@@ -29,7 +29,7 @@
             android:gravity="center"
             android:paddingBottom="8dp"
             android:paddingTop="8dp"
-            android:text="Name Surname"
+            android:text=""
             android:textColor="@color/white"
             android:textSize="15sp"
             android:fontFamily="@font/mulish"

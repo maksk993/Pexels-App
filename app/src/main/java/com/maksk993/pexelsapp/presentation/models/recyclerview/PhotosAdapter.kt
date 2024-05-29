@@ -35,6 +35,8 @@ class PhotosAdapter @Inject constructor(
         GlideInstance.loadImage(context, items[position].src.original, holder.image)
 
         if (setVisibilityGone) holder.text.visibility = View.GONE
+        else holder.text.text = items[position].photographer
+
         holder.itemView.setOnClickListener{
             listener.onItemClick(holder.adapterPosition)
         }

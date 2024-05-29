@@ -2,26 +2,26 @@ package com.maksk993.pexelsapp.presentation.screens.fragments
 
 import android.content.Context
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.widget.SearchView.OnQueryTextListener
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.maksk993.pexelsapp.R
 import com.maksk993.pexelsapp.app.App
 import com.maksk993.pexelsapp.databinding.FragmentHomeBinding
-import com.maksk993.pexelsapp.domain.models.Photo
 import com.maksk993.pexelsapp.domain.models.Collection
+import com.maksk993.pexelsapp.domain.models.Photo
 import com.maksk993.pexelsapp.presentation.models.recyclerview.FeaturedAdapter
 import com.maksk993.pexelsapp.presentation.models.recyclerview.PhotosAdapter
 import com.maksk993.pexelsapp.presentation.navigation.Screens
-import com.maksk993.pexelsapp.presentation.screens.vm.MainViewModel
-import com.maksk993.pexelsapp.presentation.screens.vm.MainViewModelFactory
+import com.maksk993.pexelsapp.presentation.vm.MainViewModel
+import com.maksk993.pexelsapp.presentation.vm.MainViewModelFactory
 import javax.inject.Inject
 
 class HomeFragment : Fragment() {
@@ -134,7 +134,6 @@ class HomeFragment : Fragment() {
             LinearLayoutManager.HORIZONTAL,
             false
         )
-       // featuredAdapter = FeaturedAdapter(requireContext(), featuredItems)
         featuredAdapter.setOnItemClickListener(object : FeaturedAdapter.OnItemClickListener{
             override fun onItemClick(position: Int) {
                 binding.searchView.setQuery(featuredAdapter.items[position].title, true)
