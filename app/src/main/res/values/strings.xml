@@ -7,4 +7,5 @@
     <string name="explore">Explore</string>
     <string name="try_again">Try Again</string>
     <string name="no_bookmarks">You haven\'t saved anything yet</string>
+    <string name="image_not_found">Image not found</string>
 </resources>

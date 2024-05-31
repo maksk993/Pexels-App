@@ -6,16 +6,24 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.maksk993.pexelsapp.domain.models.Photo
 import com.maksk993.pexelsapp.domain.usecases.AddPhotoToBookmarks
+import com.maksk993.pexelsapp.domain.usecases.DeletePhotoFromBookmarks
 import com.maksk993.pexelsapp.domain.usecases.WasPhotoAddedToBookmarks
 import kotlinx.coroutines.launch
 
 class DetailsViewModel(
     private val addPhotoToBookmarks: AddPhotoToBookmarks,
-    private val wasPhotoAddedToBookmarks: WasPhotoAddedToBookmarks
+    private val wasPhotoAddedToBookmarks: WasPhotoAddedToBookmarks,
+    private val deletePhotoFromBookmarks: DeletePhotoFromBookmarks
 ) : ViewModel() {
     fun addPhotoToBookmarks(photo: Photo){
         viewModelScope.launch {
             addPhotoToBookmarks.execute(photo)
+        }
+    }
+
+    fun deletePhotoFromBookmarks(photo: Photo){
+        viewModelScope.launch {
+            deletePhotoFromBookmarks.execute(photo)
         }
     }
 

@@ -4,6 +4,7 @@ import android.content.Context
 import com.maksk993.pexelsapp.domain.models.Collection
 import com.maksk993.pexelsapp.domain.models.Photo
 import com.maksk993.pexelsapp.domain.usecases.AddPhotoToBookmarks
+import com.maksk993.pexelsapp.domain.usecases.DeletePhotoFromBookmarks
 import com.maksk993.pexelsapp.domain.usecases.GetCuratedPhotos
 import com.maksk993.pexelsapp.domain.usecases.GetFeaturedCollections
 import com.maksk993.pexelsapp.domain.usecases.GetPhotosFromBookmarks
@@ -42,11 +43,13 @@ class AppModule(private val context: Context) {
     @Provides
     fun provideDetailsViewModelFactory(
         addPhotoToBookmarks: AddPhotoToBookmarks,
-        wasPhotoAddedToBookmarks: WasPhotoAddedToBookmarks
+        wasPhotoAddedToBookmarks: WasPhotoAddedToBookmarks,
+        deletePhotoFromBookmarks: DeletePhotoFromBookmarks
     ) : DetailsViewModelFactory {
         return DetailsViewModelFactory(
             addPhotoToBookmarks = addPhotoToBookmarks,
-            wasPhotoAddedToBookmarks = wasPhotoAddedToBookmarks
+            wasPhotoAddedToBookmarks = wasPhotoAddedToBookmarks,
+            deletePhotoFromBookmarks = deletePhotoFromBookmarks
         )
     }
 

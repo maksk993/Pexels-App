@@ -14,11 +14,6 @@ class BookmarksViewModel(
     private val _bookmarks: MutableLiveData<MutableList<Photo?>> = MutableLiveData(ArrayList())
     val bookmarks: LiveData<MutableList<Photo?>> = _bookmarks
 
-    init {
-        _bookmarks.value = ArrayList()
-        getPhotosFromBookmarks()
-    }
-
     fun getPhotosFromBookmarks(){
         viewModelScope.launch {
             _bookmarks.postValue(getPhotosFromBookmarks.execute().toMutableList())

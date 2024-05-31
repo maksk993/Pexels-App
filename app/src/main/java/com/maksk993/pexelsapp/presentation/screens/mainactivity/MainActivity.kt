@@ -1,7 +1,11 @@
 package com.maksk993.pexelsapp.presentation.screens.mainactivity
 
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.Network
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.fragment.app.Fragment
@@ -28,6 +32,7 @@ class MainActivity : AppCompatActivity() {
 
         initBottomNavMenu()
         initNavigator()
+        initConnectivityManager()
 
         NavigationManager.setRootScreen(Screens.Home())
     }
@@ -47,6 +52,17 @@ class MainActivity : AppCompatActivity() {
             if (it == Screens.Home().screenKey)
                 binding.bottomNavView.menu.findItem(R.id.nav_home).isChecked = true
         }
+    }
+
+    private fun initConnectivityManager() {
+        val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val networkCallback = object : ConnectivityManager.NetworkCallback() {
+            override fun onLost(network: Network) {
+                super.onLost(network)
+                Toast.makeText(applicationContext, "No internet connection", Toast.LENGTH_SHORT).show()
+            }
+        }
+        connectivityManager.registerDefaultNetworkCallback(networkCallback)
     }
 
     private fun initNavigator() {

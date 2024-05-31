@@ -10,6 +10,9 @@ interface BookmarksDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun addPhoto(photoDbEntity: PhotoDbEntity)
 
+    @Query("DELETE FROM bookmarks WHERE id = :id")
+    suspend fun deletePhoto(id: Long)
+
     @Query("SELECT * FROM bookmarks")
     suspend fun getPhotos(): List<PhotoDbEntity?>
 

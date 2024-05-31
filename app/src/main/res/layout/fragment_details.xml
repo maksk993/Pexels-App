@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:fillViewport="false"
+    android:id="@+id/scroll_view"
+    >
 <LinearLayout
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -72,6 +75,7 @@
         >
 
         <TextView
+            android:id="@+id/tv_download"
             android:layout_width="wrap_content"
             android:layout_height="48dp"
             android:layout_alignParentBottom="true"
@@ -91,7 +95,6 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_alignParentStart="true"
-
             android:background="@color/transparent"
             android:src="@drawable/ic_download" />
 
@@ -105,6 +108,39 @@
             android:src="@drawable/add_to_bookmarks_selector" />
 
     </RelativeLayout>
+
+    <LinearLayout
+        android:visibility="gone"
+        android:id="@+id/details_stub"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        android:layout_weight="1"
+        android:gravity="center"
+        >
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_gravity="center"
+            android:text="@string/image_not_found"
+            android:fontFamily="@font/mulish"
+            android:textColor="@color/black"
+            android:textSize="14sp"
+            />
+
+        <TextView
+            android:id="@+id/explore"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/explore"
+            android:fontFamily="@font/mulish_bold"
+            android:textColor="@color/red"
+            android:textSize="16sp"
+            android:layout_marginTop="24dp"
+            />
+    </LinearLayout>
 
 </LinearLayout>
 </ScrollView>

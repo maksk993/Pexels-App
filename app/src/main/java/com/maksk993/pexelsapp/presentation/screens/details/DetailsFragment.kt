@@ -1,16 +1,22 @@
 package com.maksk993.pexelsapp.presentation.screens.details
 
 import android.content.Context
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.Target
 import com.maksk993.pexelsapp.app.App
 import com.maksk993.pexelsapp.databinding.FragmentDetailsBinding
 import com.maksk993.pexelsapp.presentation.models.GlideInstance
 import com.maksk993.pexelsapp.presentation.navigation.NavigationManager
+import com.maksk993.pexelsapp.presentation.navigation.Screens
 import javax.inject.Inject
 
 class DetailsFragment : Fragment() {
@@ -46,7 +52,26 @@ class DetailsFragment : Fragment() {
 
     private fun initObservers() {
         NavigationManager.focusedPhoto.observe(viewLifecycleOwner){
-            GlideInstance.loadImage(requireContext(), it.src.original, binding.image)
+            val listener = object : RequestListener<Drawable> {
+            override fun onLoadFailed(
+                e: GlideException?,
+                model: Any?,
+                target: Target<Drawable>,
+                isFirstResource: Boolean
+            ): Boolean {
+                initStub()
+                return false
+            }
+
+            override fun onResourceReady(
+                resource: Drawable,
+                model: Any,
+                target: Target<Drawable>?,
+                dataSource: DataSource,
+                isFirstResource: Boolean
+            ): Boolean = false
+        }
+            GlideInstance.loadImage(requireContext(), it, binding.image, listener)
             binding.headerTitle.text = it.photographer
         }
 
@@ -62,12 +87,41 @@ class DetailsFragment : Fragment() {
             }
 
             btnAddToBookmarks.setOnClickListener {
-                NavigationManager.focusedPhoto.value?.let {
-                    viewModel.addPhotoToBookmarks(NavigationManager.focusedPhoto.value!!)
+                if (btnAddToBookmarks.isActivated) {
+                    NavigationManager.focusedPhoto.value?.let {
+                        viewModel.deletePhotoFromBookmarks(it)
+                    }
+                    btnAddToBookmarks.isActivated = false
                 }
-                btnAddToBookmarks.isActivated = true
+                else {
+                    NavigationManager.focusedPhoto.value?.let {
+                        viewModel.addPhotoToBookmarks(it)
+                    }
+                    btnAddToBookmarks.isActivated = true
+                }
+            }
+
+            btnDownload.setOnClickListener {
+                NavigationManager.focusedPhoto.value?.let {
+                    GlideInstance.downloadToStorage(requireContext(), it)
+                }
+            }
+
+            tvDownload.setOnClickListener {
+                btnDownload.performClick()
             }
         }
     }
 
+    private fun initStub() {
+        binding.apply {
+            scrollView.isFillViewport = true
+            footer.visibility = View.GONE
+            cardView.visibility = View.GONE
+            detailsStub.visibility = View.VISIBLE
+            explore.setOnClickListener{
+                NavigationManager.backToScreen(Screens.Home())
+            }
+        }
+    }
 }

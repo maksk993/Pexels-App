@@ -44,8 +44,8 @@ class BookmarksFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        initObservers()
         viewModel.getPhotosFromBookmarks()
+        initObservers()
     }
 
     private fun initObservers() {
@@ -59,6 +59,7 @@ class BookmarksFragment : Fragment() {
                     bookmarksStub.visibility = View.GONE
                     rvBookmarks.visibility = View.VISIBLE
                     for (i in it) i?.let { addItemToPhotos(i) }
+                    removeDeletedPhotos()
                 }
             }
         }
@@ -87,6 +88,16 @@ class BookmarksFragment : Fragment() {
         if (photosAdapter.items.contains(photo)) return
         photosAdapter.items.add(photo)
         photosAdapter.notifyItemInserted(photosAdapter.items.size)
+    }
+
+    private fun removeDeletedPhotos(){
+        for (i in photosAdapter.items.indices) {
+            if (viewModel.bookmarks.value?.contains(photosAdapter.items[i]) == false) {
+                photosAdapter.items.removeAt(i)
+                photosAdapter.notifyItemRemoved(i)
+                return
+            }
+        }
     }
 
 }

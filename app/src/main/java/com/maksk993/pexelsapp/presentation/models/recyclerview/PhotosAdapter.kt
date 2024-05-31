@@ -32,7 +32,7 @@ class PhotosAdapter @Inject constructor(
     override fun getItemCount(): Int = items.size
 
     override fun onBindViewHolder(holder: PhotosViewHolder, position: Int) {
-        GlideInstance.loadImage(context, items[position].src.original, holder.image)
+        GlideInstance.loadImage(context, items[position], holder.image)
 
         if (setVisibilityGone) holder.text.visibility = View.GONE
         else holder.text.text = items[position].photographer
