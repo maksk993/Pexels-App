@@ -7,7 +7,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    tools:context=".presentation.screens.fragments.DetailsFragment"
+    tools:context=".presentation.screens.details.DetailsFragment"
     android:background="@color/white"
     android:orientation="vertical">
 
@@ -102,7 +102,7 @@
             android:layout_alignParentBottom="true"
             android:layout_alignParentEnd="true"
             android:background="@color/white"
-            android:src="@drawable/add_to_bookmarks_inactive" />
+            android:src="@drawable/add_to_bookmarks_selector" />
 
     </RelativeLayout>
 

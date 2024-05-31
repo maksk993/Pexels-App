@@ -12,4 +12,7 @@ interface BookmarksDao {
 
     @Query("SELECT * FROM bookmarks")
     suspend fun getPhotos(): List<PhotoDbEntity?>
+
+    @Query("SELECT EXISTS (SELECT 1 FROM bookmarks WHERE id = :id)")
+    suspend fun doesPhotoExists(id: Long): Boolean
 }

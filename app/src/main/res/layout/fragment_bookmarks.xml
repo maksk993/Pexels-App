@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".presentation.screens.fragments.BookmarksFragment"
+    tools:context=".presentation.screens.bookmarks.BookmarksFragment"
     android:background="@color/white"
     android:orientation="vertical">
 
@@ -11,11 +11,10 @@
         android:id="@+id/header_title"
         android:layout_width="match_parent"
         android:layout_height="50dp"
+        android:layout_marginTop="12dp"
         android:background="@color/white"
         android:fontFamily="@font/mulish_bold"
         android:gravity="center"
-        android:paddingStart="24dp"
-        android:paddingEnd="24dp"
         android:text="@string/bookmarks"
         android:textColor="@color/black"
         android:textSize="18sp"

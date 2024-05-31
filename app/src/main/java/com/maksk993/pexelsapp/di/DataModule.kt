@@ -1,6 +1,5 @@
 package com.maksk993.pexelsapp.di
 
-import android.content.Context
 import com.maksk993.data.models.room.DatabaseDependency
 import com.maksk993.data.repository.BookmarksRepositoryImpl
 import com.maksk993.data.repository.CollectionRepositoryImpl
@@ -13,9 +12,6 @@ import dagger.Provides
 
 @Module
 class DataModule {
-    @Provides
-    fun provideDatabase(context: Context): DatabaseDependency = DatabaseDependency(context)
-
     @Provides
     fun provideBookmarksRepository(database: DatabaseDependency): BookmarksRepository {
         return BookmarksRepositoryImpl(database.getDao())

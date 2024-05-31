@@ -48,6 +48,9 @@ dependencies {
     implementation("androidx.room:room-runtime:2.6.1")
     implementation("androidx.room:room-ktx:2.6.1")
 
+    // @Inject
+    implementation("javax.inject:javax.inject:1")
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
 }

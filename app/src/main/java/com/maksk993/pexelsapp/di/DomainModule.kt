@@ -7,6 +7,7 @@ import com.maksk993.pexelsapp.domain.usecases.AddPhotoToBookmarks
 import com.maksk993.pexelsapp.domain.usecases.GetCuratedPhotos
 import com.maksk993.pexelsapp.domain.usecases.GetFeaturedCollections
 import com.maksk993.pexelsapp.domain.usecases.GetPhotosFromBookmarks
+import com.maksk993.pexelsapp.domain.usecases.WasPhotoAddedToBookmarks
 import dagger.Module
 import dagger.Provides
 
@@ -30,5 +31,10 @@ class DomainModule {
     @Provides
     fun provideGetPhotosFromBookmarks(repository: BookmarksRepository): GetPhotosFromBookmarks {
         return GetPhotosFromBookmarks(repository)
+    }
+
+    @Provides
+    fun provideWasPhotoAddedToBookmarks(repository: BookmarksRepository): WasPhotoAddedToBookmarks {
+        return WasPhotoAddedToBookmarks(repository)
     }
 }

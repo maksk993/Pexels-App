@@ -1,8 +1,7 @@
-package com.maksk993.pexelsapp.presentation.screens
+package com.maksk993.pexelsapp.presentation.screens.mainactivity
 
 import android.os.Bundle
 import android.view.View
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.fragment.app.Fragment
@@ -12,17 +11,11 @@ import com.github.terrakok.cicerone.androidx.FragmentScreen
 import com.maksk993.pexelsapp.R
 import com.maksk993.pexelsapp.app.App
 import com.maksk993.pexelsapp.databinding.ActivityMainBinding
+import com.maksk993.pexelsapp.presentation.navigation.NavigationManager
 import com.maksk993.pexelsapp.presentation.navigation.Screens
-import com.maksk993.pexelsapp.presentation.vm.MainViewModel
-import com.maksk993.pexelsapp.presentation.vm.MainViewModelFactory
-import javax.inject.Inject
 
 
 class MainActivity : AppCompatActivity() {
-    @Inject
-    lateinit var viewModelFactory: MainViewModelFactory
-    private val viewModel: MainViewModel by viewModels { viewModelFactory }
-
     private lateinit var binding: ActivityMainBinding
     private lateinit var navigator: AppNavigator
 
@@ -36,21 +29,23 @@ class MainActivity : AppCompatActivity() {
         initBottomNavMenu()
         initNavigator()
 
-        viewModel.setRootScreen(Screens.Home())
+        NavigationManager.setRootScreen(Screens.Home())
     }
 
     override fun onStart() {
         super.onStart()
-        viewModel.getFeaturedCollections()
         initObservers()
     }
 
     private fun initObservers() {
-        viewModel.currentFragment.observe(this){
+        NavigationManager.currentScreen.observe(this){
             if (it == Screens.Details().screenKey){
                 binding.bottomNavView.visibility = View.GONE
             }
             else binding.bottomNavView.visibility = View.VISIBLE
+
+            if (it == Screens.Home().screenKey)
+                binding.bottomNavView.menu.findItem(R.id.nav_home).isChecked = true
         }
     }
 
@@ -79,11 +74,11 @@ class MainActivity : AppCompatActivity() {
             setOnNavigationItemSelectedListener {
                 when (it.itemId) {
                     R.id.nav_home -> {
-                        viewModel.backToScreen(Screens.Home())
+                        NavigationManager.backToScreen(Screens.Home())
                         return@setOnNavigationItemSelectedListener true
                     }
                     R.id.nav_bookmarks -> {
-                        viewModel.navigateToScreen(Screens.Bookmarks())
+                        NavigationManager.navigateToScreen(Screens.Bookmarks())
                         return@setOnNavigationItemSelectedListener true
                     }
                 }
@@ -94,21 +89,19 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResumeFragments() {
         super.onResumeFragments()
-        viewModel.navigatorHolder.setNavigator(navigator)
+        NavigationManager.setNavigator(navigator)
     }
 
     override fun onPause() {
-        viewModel.navigatorHolder.removeNavigator()
+        NavigationManager.removeNavigator()
         super.onPause()
     }
 
     override fun onBackPressed() {
-        if (viewModel.currentFragment.value == Screens.Home().screenKey)
-            super.onBackPressed()
-        else {
-            viewModel.backToScreen(Screens.Home())
+        if (binding.bottomNavView.visibility == View.VISIBLE)
             binding.bottomNavView.menu.findItem(R.id.nav_home).isChecked = true
-        }
+        else binding.bottomNavView.visibility = View.VISIBLE
+        super.onBackPressed()
     }
 
 }

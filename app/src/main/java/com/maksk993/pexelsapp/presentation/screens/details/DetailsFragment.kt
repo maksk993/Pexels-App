@@ -1,4 +1,4 @@
-package com.maksk993.pexelsapp.presentation.screens.fragments
+package com.maksk993.pexelsapp.presentation.screens.details
 
 import android.content.Context
 import android.os.Bundle
@@ -6,19 +6,17 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import com.maksk993.pexelsapp.app.App
 import com.maksk993.pexelsapp.databinding.FragmentDetailsBinding
 import com.maksk993.pexelsapp.presentation.models.GlideInstance
-import com.maksk993.pexelsapp.presentation.navigation.Screens
-import com.maksk993.pexelsapp.presentation.vm.MainViewModel
-import com.maksk993.pexelsapp.presentation.vm.MainViewModelFactory
+import com.maksk993.pexelsapp.presentation.navigation.NavigationManager
 import javax.inject.Inject
 
 class DetailsFragment : Fragment() {
     @Inject
-    lateinit var viewModelFactory: MainViewModelFactory
-    private val viewModel: MainViewModel by activityViewModels { viewModelFactory }
+    lateinit var viewModelFactory: DetailsViewModelFactory
+    private val viewModel: DetailsViewModel by viewModels { viewModelFactory }
 
     private lateinit var binding: FragmentDetailsBinding
 
@@ -41,23 +39,33 @@ class DetailsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initObservers()
+        NavigationManager.focusedPhoto.value?.let {
+            viewModel.wasPhotoAddedToBookmarks(NavigationManager.focusedPhoto.value!!)
+        }
     }
 
     private fun initObservers() {
-        viewModel.focusedPhoto.observe(viewLifecycleOwner){
+        NavigationManager.focusedPhoto.observe(viewLifecycleOwner){
             GlideInstance.loadImage(requireContext(), it.src.original, binding.image)
             binding.headerTitle.text = it.photographer
+        }
+
+        viewModel.wasAdded.observe(viewLifecycleOwner){
+            binding.btnAddToBookmarks.isActivated = it
         }
     }
 
     private fun initButtons() {
         binding.apply {
             btnBack.setOnClickListener{
-                viewModel.backToScreen(Screens.Home())
+                activity?.onBackPressed()
             }
 
             btnAddToBookmarks.setOnClickListener {
-                viewModel.addPhotoToBookmarks()
+                NavigationManager.focusedPhoto.value?.let {
+                    viewModel.addPhotoToBookmarks(NavigationManager.focusedPhoto.value!!)
+                }
+                btnAddToBookmarks.isActivated = true
             }
         }
     }

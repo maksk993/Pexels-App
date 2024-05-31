@@ -1,4 +1,4 @@
-package com.maksk993.pexelsapp.presentation.screens.fragments
+package com.maksk993.pexelsapp.presentation.screens.home
 
 import android.content.Context
 import android.os.Bundle
@@ -9,7 +9,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.widget.SearchView.OnQueryTextListener
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.maksk993.pexelsapp.R
@@ -19,15 +19,14 @@ import com.maksk993.pexelsapp.domain.models.Collection
 import com.maksk993.pexelsapp.domain.models.Photo
 import com.maksk993.pexelsapp.presentation.models.recyclerview.FeaturedAdapter
 import com.maksk993.pexelsapp.presentation.models.recyclerview.PhotosAdapter
+import com.maksk993.pexelsapp.presentation.navigation.NavigationManager
 import com.maksk993.pexelsapp.presentation.navigation.Screens
-import com.maksk993.pexelsapp.presentation.vm.MainViewModel
-import com.maksk993.pexelsapp.presentation.vm.MainViewModelFactory
 import javax.inject.Inject
 
 class HomeFragment : Fragment() {
     @Inject
-    lateinit var viewModelFactory: MainViewModelFactory
-    private val viewModel: MainViewModel by activityViewModels { viewModelFactory }
+    lateinit var viewModelFactory: HomeViewModelFactory
+    private val viewModel: HomeViewModel by viewModels { viewModelFactory }
 
     private lateinit var binding: FragmentHomeBinding
 
@@ -58,7 +57,6 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initObservers()
-        viewModel.getPhotos()
     }
 
     private fun initObservers() {
@@ -121,8 +119,8 @@ class HomeFragment : Fragment() {
         photosAdapter.setVisibilityGone = true
         photosAdapter.setOnItemClickListener(object : PhotosAdapter.OnItemClickListener{
             override fun onItemClick(position: Int) {
-                viewModel.setFocusedPhoto(photosAdapter.items[position])
-                viewModel.navigateToScreen(Screens.Details())
+                NavigationManager.setFocusedPhoto(photosAdapter.items[position])
+                NavigationManager.navigateToScreen(Screens.Details())
             }
         })
         binding.rvPhotos.adapter = photosAdapter

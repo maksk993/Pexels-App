@@ -1,4 +1,4 @@
-package com.maksk993.pexelsapp.presentation.screens.fragments
+package com.maksk993.pexelsapp.presentation.screens.bookmarks
 
 import android.content.Context
 import android.os.Bundle
@@ -6,20 +6,19 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.maksk993.pexelsapp.app.App
 import com.maksk993.pexelsapp.databinding.FragmentBookmarksBinding
 import com.maksk993.pexelsapp.presentation.models.recyclerview.PhotosAdapter
+import com.maksk993.pexelsapp.presentation.navigation.NavigationManager
 import com.maksk993.pexelsapp.presentation.navigation.Screens
-import com.maksk993.pexelsapp.presentation.vm.MainViewModel
-import com.maksk993.pexelsapp.presentation.vm.MainViewModelFactory
 import javax.inject.Inject
 
 class BookmarksFragment : Fragment() {
     @Inject
-    lateinit var viewModelFactory: MainViewModelFactory
-    private val viewModel: MainViewModel by activityViewModels { viewModelFactory }
+    lateinit var viewModelFactory: BookmarksViewModelFactory
+    private val viewModel: BookmarksViewModel by viewModels { viewModelFactory }
 
     private lateinit var binding: FragmentBookmarksBinding
 
@@ -67,7 +66,7 @@ class BookmarksFragment : Fragment() {
 
     private fun initStub() {
         binding.explore.setOnClickListener{
-            requireActivity().onBackPressed()
+            activity?.onBackPressed()
         }
     }
 
@@ -77,8 +76,8 @@ class BookmarksFragment : Fragment() {
         )
         photosAdapter.setOnItemClickListener(object : PhotosAdapter.OnItemClickListener{
             override fun onItemClick(position: Int) {
-                viewModel.setFocusedPhoto(photosAdapter.items[position])
-                viewModel.navigateToScreen(Screens.Details())
+                NavigationManager.setFocusedPhoto(photosAdapter.items[position])
+                NavigationManager.navigateToScreen(Screens.Details())
             }
         })
         binding.rvBookmarks.adapter = photosAdapter

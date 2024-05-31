@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:drawable="@drawable/add_to_bookmarks_inactive"
+        android:state_activated="false"
+        android:title="" />
+    <item
+        android:drawable="@drawable/add_to_bookmarks_active"
+        android:state_activated="true"
+        android:title="" />
+</selector>
