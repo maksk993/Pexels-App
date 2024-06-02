@@ -1,7 +1,8 @@
 package com.maksk993.pexelsapp.domain.repository
 
-import com.maksk993.pexelsapp.domain.models.CollectionCallback
+import com.maksk993.pexelsapp.domain.models.Collection
+import io.reactivex.Single
 
 interface CollectionRepository {
-    fun getFeaturedCollections(callback: CollectionCallback)
+    fun getFeaturedCollections(): Single<List<Collection>>
 }

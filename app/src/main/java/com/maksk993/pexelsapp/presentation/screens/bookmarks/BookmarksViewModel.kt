@@ -3,20 +3,33 @@ package com.maksk993.pexelsapp.presentation.screens.bookmarks
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.maksk993.pexelsapp.domain.models.Photo
 import com.maksk993.pexelsapp.domain.usecases.GetPhotosFromBookmarks
-import kotlinx.coroutines.launch
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.schedulers.Schedulers
 
 class BookmarksViewModel(
     private val getPhotosFromBookmarks: GetPhotosFromBookmarks
 ) : ViewModel() {
-    private val _bookmarks: MutableLiveData<MutableList<Photo?>> = MutableLiveData(ArrayList())
-    val bookmarks: LiveData<MutableList<Photo?>> = _bookmarks
+    private val disposable = CompositeDisposable()
+
+    private val _bookmarks: MutableLiveData<List<Photo?>> = MutableLiveData(ArrayList())
+    val bookmarks: LiveData<List<Photo?>> = _bookmarks
 
     fun getPhotosFromBookmarks(){
-        viewModelScope.launch {
-            _bookmarks.postValue(getPhotosFromBookmarks.execute().toMutableList())
-        }
+        disposable.add(getPhotosFromBookmarks.execute()
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(
+                { photos -> _bookmarks.value = photos },
+                { throwable -> throwable.printStackTrace() }
+            )
+        )
+    }
+
+    override fun onCleared() {
+        disposable.clear()
+        super.onCleared()
     }
 }

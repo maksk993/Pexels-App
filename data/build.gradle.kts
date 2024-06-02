@@ -47,9 +47,14 @@ dependencies {
     kapt("androidx.room:room-compiler:2.6.1")
     implementation("androidx.room:room-runtime:2.6.1")
     implementation("androidx.room:room-ktx:2.6.1")
+    implementation("androidx.room:room-rxjava2:2.6.1")
 
     // @Inject
     implementation("javax.inject:javax.inject:1")
+
+    // RxJava 2
+    implementation("io.reactivex.rxjava2:rxjava:2.2.21")
+    implementation("io.reactivex.rxjava2:rxandroid:2.1.1")
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

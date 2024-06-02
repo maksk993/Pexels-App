@@ -4,12 +4,26 @@ import com.maksk993.data.models.room.BookmarksDao
 import com.maksk993.data.models.room.PhotoDbEntity
 import com.maksk993.pexelsapp.domain.models.Photo
 import com.maksk993.pexelsapp.domain.repository.BookmarksRepository
+import io.reactivex.Completable
+import io.reactivex.Single
 
 class BookmarksRepositoryImpl(private val dao: BookmarksDao) : BookmarksRepository {
 
-    override suspend fun addPhoto(photo: Photo) = dao.addPhoto(PhotoDbEntity.toDbEntity(photo))
-    override suspend fun deletePhoto(photo: Photo) = dao.deletePhoto(photo.id)
+    override fun addPhoto(photo: Photo): Completable {
+        return Completable.fromAction {
+            dao.addPhoto(PhotoDbEntity.toDbEntity(photo))
+        }
+    }
+    override fun deletePhoto(photo: Photo): Completable {
+        return Completable.fromAction {
+            dao.deletePhoto(photo.id)
+        }
+    }
 
-    override suspend fun getPhotos(): List<Photo?> = dao.getPhotos().map { it?.toPhoto() }
-    override suspend fun wasPhotoAdded(photo: Photo): Boolean = dao.doesPhotoExists(photo.id)
+    override fun getPhotos(): Single<List<Photo?>> {
+        return dao.getPhotos().map { list ->
+            list.map { it?.toPhoto() }
+        }
+    }
+    override fun wasPhotoAdded(photo: Photo): Single<Boolean> = dao.doesPhotoExists(photo.id)
 }

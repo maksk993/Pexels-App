@@ -1,11 +1,13 @@
 package com.maksk993.pexelsapp.domain.repository
 
 import com.maksk993.pexelsapp.domain.models.Photo
+import io.reactivex.Completable
+import io.reactivex.Single
 
 interface BookmarksRepository {
-    suspend fun addPhoto(photo: Photo)
+    fun addPhoto(photo: Photo): Completable
 
-    suspend fun deletePhoto(photo: Photo)
-    suspend fun getPhotos(): List<Photo?>
-    suspend fun wasPhotoAdded(photo: Photo): Boolean
+    fun deletePhoto(photo: Photo): Completable
+    fun getPhotos(): Single<List<Photo?>>
+    fun wasPhotoAdded(photo: Photo): Single<Boolean>
 }

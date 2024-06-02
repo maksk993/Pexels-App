@@ -4,18 +4,19 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import io.reactivex.Single
 
 @Dao
 interface BookmarksDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun addPhoto(photoDbEntity: PhotoDbEntity)
+    fun addPhoto(photoDbEntity: PhotoDbEntity)
 
     @Query("DELETE FROM bookmarks WHERE id = :id")
-    suspend fun deletePhoto(id: Long)
+    fun deletePhoto(id: Long)
 
     @Query("SELECT * FROM bookmarks")
-    suspend fun getPhotos(): List<PhotoDbEntity?>
+    fun getPhotos(): Single<List<PhotoDbEntity?>>
 
     @Query("SELECT EXISTS (SELECT 1 FROM bookmarks WHERE id = :id)")
-    suspend fun doesPhotoExists(id: Long): Boolean
+    fun doesPhotoExists(id: Long): Single<Boolean>
 }

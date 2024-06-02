@@ -11,4 +11,8 @@ java {
 dependencies {
     // @Inject
     implementation("javax.inject:javax.inject:1")
+
+    // RxJava 2
+    implementation("io.reactivex.rxjava2:rxjava:2.2.21")
+    implementation("io.reactivex.rxjava2:rxandroid:2.1.1")
 }

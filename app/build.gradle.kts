@@ -47,6 +47,7 @@ dependencies {
     // Dagger
     implementation("com.google.dagger:dagger:2.51.1")
     kapt("com.google.dagger:dagger-compiler:2.51.1")
+    // @Inject
     implementation("javax.inject:javax.inject:1")
 
     // Cicerone
@@ -55,6 +56,10 @@ dependencies {
     implementation("androidx.core:core-splashscreen:1.0.1")
     // Glide
     implementation("com.github.bumptech.glide:glide:4.16.0")
+
+    // RxJava 2
+    implementation("io.reactivex.rxjava2:rxjava:2.2.21")
+    implementation("io.reactivex.rxjava2:rxandroid:2.1.1")
 
     // by viewModels
     implementation("androidx.fragment:fragment-ktx:1.7.0")
