@@ -18,6 +18,9 @@ class DetailsViewModel(
 ) : ViewModel() {
     private val disposable = CompositeDisposable()
 
+    private var _shouldProgressBarBeVisible: MutableLiveData<Boolean> = MutableLiveData(true)
+    var shouldProgressBarBeVisible: LiveData<Boolean> = _shouldProgressBarBeVisible
+
     fun addPhotoToBookmarks(photo: Photo){
         disposable.add(addPhotoToBookmarks.execute(photo)
             .subscribeOn(Schedulers.io())
@@ -36,11 +39,15 @@ class DetailsViewModel(
     val wasAdded: LiveData<Boolean> = _wasAdded
 
     fun wasPhotoAddedToBookmarks(photo: Photo) {
+        _shouldProgressBarBeVisible.value = true
         disposable.add(wasPhotoAddedToBookmarks.execute(photo)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
-                { bool -> _wasAdded.value = bool },
+                { bool ->
+                    _shouldProgressBarBeVisible.value = false
+                    _wasAdded.value = bool
+                },
                 { throwable -> throwable.printStackTrace() }
             )
         )

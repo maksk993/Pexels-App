@@ -17,12 +17,19 @@ class BookmarksViewModel(
     private val _bookmarks: MutableLiveData<List<Photo?>> = MutableLiveData(ArrayList())
     val bookmarks: LiveData<List<Photo?>> = _bookmarks
 
+    private var _shouldProgressBarBeVisible: MutableLiveData<Boolean> = MutableLiveData(true)
+    var shouldProgressBarBeVisible: LiveData<Boolean> = _shouldProgressBarBeVisible
+
     fun getPhotosFromBookmarks(){
+        _shouldProgressBarBeVisible.value = true
         disposable.add(getPhotosFromBookmarks.execute()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
-                { photos -> _bookmarks.value = photos },
+                { photos ->
+                    _shouldProgressBarBeVisible.value = false
+                    _bookmarks.value = photos
+                },
                 { throwable -> throwable.printStackTrace() }
             )
         )

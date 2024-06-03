@@ -17,6 +17,10 @@ import com.maksk993.pexelsapp.databinding.FragmentDetailsBinding
 import com.maksk993.pexelsapp.presentation.models.GlideInstance
 import com.maksk993.pexelsapp.presentation.navigation.NavigationManager
 import com.maksk993.pexelsapp.presentation.navigation.Screens
+import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.Disposable
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class DetailsFragment : Fragment() {
@@ -25,6 +29,8 @@ class DetailsFragment : Fragment() {
     private val viewModel: DetailsViewModel by viewModels { viewModelFactory }
 
     private lateinit var binding: FragmentDetailsBinding
+
+    private lateinit var disposable: Disposable
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -78,6 +84,25 @@ class DetailsFragment : Fragment() {
         viewModel.wasAdded.observe(viewLifecycleOwner){
             binding.btnAddToBookmarks.isActivated = it
         }
+
+        viewModel.shouldProgressBarBeVisible.observe(viewLifecycleOwner){
+            binding.apply {
+                if (it) {
+                    progressBar.progress = 0
+                    progressBar.visibility = View.VISIBLE
+                }
+                else {
+                    disposable = Observable.interval(30, TimeUnit.MILLISECONDS)
+                        .takeWhile { progressBar.progress < 100 }
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(
+                            { progressBar.incrementProgressBy(10) },
+                            { throwable -> throwable.printStackTrace() },
+                            { progressBar.visibility = View.GONE }
+                        )
+                }
+            }
+        }
     }
 
     private fun initButtons() {
@@ -123,5 +148,10 @@ class DetailsFragment : Fragment() {
                 NavigationManager.backToScreen(Screens.Home())
             }
         }
+    }
+
+    override fun onDestroy() {
+        if (::disposable.isInitialized) disposable.dispose()
+        super.onDestroy()
     }
 }

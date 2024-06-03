@@ -9,21 +9,15 @@ import io.reactivex.Single
 
 class BookmarksRepositoryImpl(private val dao: BookmarksDao) : BookmarksRepository {
 
-    override fun addPhoto(photo: Photo): Completable {
-        return Completable.fromAction {
-            dao.addPhoto(PhotoDbEntity.toDbEntity(photo))
-        }
-    }
-    override fun deletePhoto(photo: Photo): Completable {
-        return Completable.fromAction {
-            dao.deletePhoto(photo.id)
-        }
-    }
+    override fun addPhoto(photo: Photo): Completable = dao.addPhoto(PhotoDbEntity.toDbEntity(photo))
+
+    override fun deletePhoto(photo: Photo): Completable = dao.deletePhoto(photo.id)
 
     override fun getPhotos(): Single<List<Photo?>> {
         return dao.getPhotos().map { list ->
             list.map { it?.toPhoto() }
         }
     }
+
     override fun wasPhotoAdded(photo: Photo): Single<Boolean> = dao.doesPhotoExists(photo.id)
 }

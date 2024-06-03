@@ -54,8 +54,8 @@ class AppModule(private val context: Context) {
     }
 
     @Provides
-    fun provideFeaturedItems(): MutableList<Collection> = ArrayList()
+    fun provideCollectionItems(): MutableList<Collection> = ArrayList()
 
     @Provides
-    fun providePhotosItems(): MutableList<Photo> = ArrayList()
+    fun providePhotoItems(): MutableList<Photo> = ArrayList()
 }

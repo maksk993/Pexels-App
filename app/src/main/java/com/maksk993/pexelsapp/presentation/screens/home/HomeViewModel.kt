@@ -18,6 +18,9 @@ class HomeViewModel(
 
     private val disposable: CompositeDisposable = CompositeDisposable()
 
+    private var _shouldProgressBarBeVisible: MutableLiveData<Boolean> = MutableLiveData(true)
+    var shouldProgressBarBeVisible: LiveData<Boolean> = _shouldProgressBarBeVisible
+
     init {
         getFeaturedCollections()
         getPhotos()
@@ -41,13 +44,20 @@ class HomeViewModel(
     }
 
     fun getPhotos(collection: Collection = Collection("Popular")){
+        _shouldProgressBarBeVisible.value = true
         disposable.add(getCuratedPhotos.execute(collection)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
-                { photos -> _photos.value = photos },
+                {  photos ->
+                    _shouldProgressBarBeVisible.value = false
+                    _photos.value = photos
+                },
                 { throwable -> throwable.printStackTrace() },
-                { _photos.value = null }
+                {
+                    _shouldProgressBarBeVisible.value = false
+                    _photos.value = null
+                }
             )
         )
     }

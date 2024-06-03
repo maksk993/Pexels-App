@@ -10,28 +10,24 @@ import com.maksk993.pexelsapp.domain.models.Photo
 import com.maksk993.pexelsapp.presentation.models.GlideInstance
 import javax.inject.Inject
 
-class PhotosAdapter @Inject constructor(
+class PhotoAdapter @Inject constructor(
     val context: Context,
     var items: MutableList<Photo>,
-) : RecyclerView.Adapter<PhotosViewHolder>() {
-    private lateinit var listener: OnItemClickListener
+) : RecyclerView.Adapter<PhotoViewHolder>() {
+    lateinit var listener: OnItemClickListener
     var setVisibilityGone: Boolean = false
 
     interface OnItemClickListener {
         fun onItemClick(position: Int)
     }
 
-    fun setOnItemClickListener(listener: OnItemClickListener) {
-        this.listener = listener
-    }
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PhotosViewHolder {
-        return PhotosViewHolder(LayoutInflater.from(context).inflate(R.layout.item_photos, parent, false))
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PhotoViewHolder {
+        return PhotoViewHolder(LayoutInflater.from(context).inflate(R.layout.item_photo, parent, false))
     }
 
     override fun getItemCount(): Int = items.size
 
-    override fun onBindViewHolder(holder: PhotosViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: PhotoViewHolder, position: Int) {
         GlideInstance.loadImage(context, items[position], holder.image)
 
         if (setVisibilityGone) holder.text.visibility = View.GONE

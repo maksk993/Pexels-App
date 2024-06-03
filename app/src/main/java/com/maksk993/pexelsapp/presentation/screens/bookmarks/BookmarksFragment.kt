@@ -10,9 +10,13 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.maksk993.pexelsapp.app.App
 import com.maksk993.pexelsapp.databinding.FragmentBookmarksBinding
-import com.maksk993.pexelsapp.presentation.models.recyclerview.PhotosAdapter
+import com.maksk993.pexelsapp.presentation.models.recyclerview.PhotoAdapter
 import com.maksk993.pexelsapp.presentation.navigation.NavigationManager
 import com.maksk993.pexelsapp.presentation.navigation.Screens
+import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.Disposable
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class BookmarksFragment : Fragment() {
@@ -23,7 +27,9 @@ class BookmarksFragment : Fragment() {
     private lateinit var binding: FragmentBookmarksBinding
 
     @Inject
-    lateinit var photosAdapter: PhotosAdapter
+    lateinit var photoAdapter: PhotoAdapter
+
+    private lateinit var disposable: Disposable
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -50,7 +56,7 @@ class BookmarksFragment : Fragment() {
 
     private fun initObservers() {
         viewModel.bookmarks.observe(viewLifecycleOwner){
-            with(binding){
+            binding.apply {
                 if (it.isEmpty()) {
                     rvBookmarks.visibility = View.GONE
                     bookmarksStub.visibility = View.VISIBLE
@@ -60,6 +66,27 @@ class BookmarksFragment : Fragment() {
                     rvBookmarks.visibility = View.VISIBLE
                     for (i in it) i?.let { addItemToPhotos(i) }
                     removeDeletedPhotos()
+                }
+            }
+        }
+
+        viewModel.shouldProgressBarBeVisible.observe(viewLifecycleOwner){
+            binding.apply {
+                if (it) {
+                    progressBar.progress = 0
+                    progressBar.visibility = View.VISIBLE
+                    rvBookmarks.visibility = View.GONE
+                    bookmarksStub.visibility = View.GONE
+                }
+                else {
+                    disposable = Observable.interval(30, TimeUnit.MILLISECONDS)
+                        .takeWhile { progressBar.progress < 100 }
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(
+                            { progressBar.incrementProgressBy(10) },
+                            { throwable -> throwable.printStackTrace() },
+                            { progressBar.visibility = View.GONE }
+                        )
                 }
             }
         }
@@ -75,29 +102,33 @@ class BookmarksFragment : Fragment() {
         binding.rvBookmarks.layoutManager = StaggeredGridLayoutManager(
             2, StaggeredGridLayoutManager.VERTICAL
         )
-        photosAdapter.setOnItemClickListener(object : PhotosAdapter.OnItemClickListener{
+        photoAdapter.listener = object : PhotoAdapter.OnItemClickListener{
             override fun onItemClick(position: Int) {
-                NavigationManager.setFocusedPhoto(photosAdapter.items[position])
+                NavigationManager.setFocusedPhoto(photoAdapter.items[position])
                 NavigationManager.navigateToScreen(Screens.Details())
             }
-        })
-        binding.rvBookmarks.adapter = photosAdapter
+        }
+        binding.rvBookmarks.adapter = photoAdapter
     }
 
     private fun addItemToPhotos(photo: com.maksk993.pexelsapp.domain.models.Photo){
-        if (photosAdapter.items.contains(photo)) return
-        photosAdapter.items.add(photo)
-        photosAdapter.notifyItemInserted(photosAdapter.items.size)
+        if (photoAdapter.items.contains(photo)) return
+        photoAdapter.items.add(photo)
+        photoAdapter.notifyItemInserted(photoAdapter.items.size)
     }
 
     private fun removeDeletedPhotos(){
-        for (i in photosAdapter.items.indices) {
-            if (viewModel.bookmarks.value?.contains(photosAdapter.items[i]) == false) {
-                photosAdapter.items.removeAt(i)
-                photosAdapter.notifyItemRemoved(i)
+        for (i in photoAdapter.items.indices) {
+            if (viewModel.bookmarks.value?.contains(photoAdapter.items[i]) == false) {
+                photoAdapter.items.removeAt(i)
+                photoAdapter.notifyItemRemoved(i)
                 return
             }
         }
     }
 
+    override fun onDestroy() {
+        if (::disposable.isInitialized) disposable.dispose()
+        super.onDestroy()
+    }
 }
