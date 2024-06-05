@@ -26,12 +26,16 @@ object NavigationManager {
     private val _currentScreen: MutableLiveData<String> = MutableLiveData()
     val currentScreen: LiveData<String> = _currentScreen
 
+    private val _focusedPhoto: MutableLiveData<Photo> = MutableLiveData()
+    val focusedPhoto: LiveData<Photo> = _focusedPhoto
+
     fun setRootScreen(screen: Screen) {
         router.newRootScreen(screen)
         _currentScreen.value = screen.screenKey
     }
 
-    fun navigateToScreen(screen: Screen) {
+    fun navigateToScreen(screen: Screen, photo: Photo? = null) {
+        photo?.let { _focusedPhoto.value = it }
         router.navigateTo(screen)
         _currentScreen.value = screen.screenKey
     }
@@ -39,12 +43,5 @@ object NavigationManager {
     fun backToScreen(screen: Screen) {
         router.backTo(screen)
         _currentScreen.value = screen.screenKey
-    }
-
-    private val _focusedPhoto: MutableLiveData<Photo> = MutableLiveData()
-    val focusedPhoto: LiveData<Photo> = _focusedPhoto
-
-    fun setFocusedPhoto(photo: Photo){
-        _focusedPhoto.value = photo
     }
 }

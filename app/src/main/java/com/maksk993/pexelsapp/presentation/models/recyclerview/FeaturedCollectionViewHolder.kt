@@ -6,7 +6,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.maksk993.pexelsapp.R
 
-class CollectionViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+class FeaturedCollectionViewHolder(view: View) : RecyclerView.ViewHolder(view) {
     var text: TextView
     init {
         text = view.findViewById(R.id.tv_item)

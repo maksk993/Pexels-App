@@ -3,17 +3,17 @@ package com.maksk993.pexelsapp.presentation.screens.home
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.maksk993.pexelsapp.domain.models.Collection
+import com.maksk993.pexelsapp.domain.models.FeaturedCollection
 import com.maksk993.pexelsapp.domain.models.Photo
-import com.maksk993.pexelsapp.domain.usecases.GetCuratedPhotos
-import com.maksk993.pexelsapp.domain.usecases.GetFeaturedCollections
+import com.maksk993.pexelsapp.domain.usecases.GetCuratedPhotosUseCase
+import com.maksk993.pexelsapp.domain.usecases.GetFeaturedCollectionsUseCase
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 
 class HomeViewModel(
-    private val getFeaturedCollections: GetFeaturedCollections,
-    private val getCuratedPhotos: GetCuratedPhotos,
+    private val getFeaturedCollectionsUseCase: GetFeaturedCollectionsUseCase,
+    private val getCuratedPhotosUseCase: GetCuratedPhotosUseCase,
 ) : ViewModel() {
 
     private val disposable: CompositeDisposable = CompositeDisposable()
@@ -26,14 +26,14 @@ class HomeViewModel(
         getPhotos()
     }
 
-    private val _featuredCollections: MutableLiveData<List<Collection>> = MutableLiveData(ArrayList())
-    val featuredCollections: LiveData<List<Collection>> = _featuredCollections
+    private val _featuredCollections: MutableLiveData<List<FeaturedCollection>> = MutableLiveData(ArrayList())
+    val featuredCollections: LiveData<List<FeaturedCollection>> = _featuredCollections
 
     private val _photos: MutableLiveData<List<Photo>?> = MutableLiveData(ArrayList())
     val photos: LiveData<List<Photo>?> = _photos
 
     fun getFeaturedCollections() {
-        disposable.add(getFeaturedCollections.execute()
+        disposable.add(getFeaturedCollectionsUseCase.execute()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
@@ -43,9 +43,9 @@ class HomeViewModel(
         )
     }
 
-    fun getPhotos(collection: Collection = Collection("Popular")){
+    fun getPhotos(collection: FeaturedCollection = FeaturedCollection("Popular")){
         _shouldProgressBarBeVisible.value = true
-        disposable.add(getCuratedPhotos.execute(collection)
+        disposable.add(getCuratedPhotosUseCase.execute(collection)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
@@ -64,6 +64,7 @@ class HomeViewModel(
 
     override fun onCleared() {
         disposable.clear()
+        disposable.dispose()
         super.onCleared()
     }
 }

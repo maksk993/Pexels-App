@@ -104,8 +104,10 @@ class BookmarksFragment : Fragment() {
         )
         photoAdapter.listener = object : PhotoAdapter.OnItemClickListener{
             override fun onItemClick(position: Int) {
-                NavigationManager.setFocusedPhoto(photoAdapter.items[position])
-                NavigationManager.navigateToScreen(Screens.Details())
+                NavigationManager.navigateToScreen(
+                    screen = Screens.Details(),
+                    photo = photoAdapter.items[position]
+                )
             }
         }
         binding.rvBookmarks.adapter = photoAdapter

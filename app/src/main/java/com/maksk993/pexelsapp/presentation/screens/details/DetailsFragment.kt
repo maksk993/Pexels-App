@@ -12,9 +12,10 @@ import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
+import com.maksk993.pexelsapp.R
 import com.maksk993.pexelsapp.app.App
 import com.maksk993.pexelsapp.databinding.FragmentDetailsBinding
-import com.maksk993.pexelsapp.presentation.models.GlideInstance
+import com.maksk993.pexelsapp.presentation.models.glide.GlideInstance
 import com.maksk993.pexelsapp.presentation.navigation.NavigationManager
 import com.maksk993.pexelsapp.presentation.navigation.Screens
 import io.reactivex.Observable
@@ -75,31 +76,44 @@ class DetailsFragment : Fragment() {
                 target: Target<Drawable>?,
                 dataSource: DataSource,
                 isFirstResource: Boolean
-            ): Boolean = false
+            ): Boolean {
+                viewModel.getFileSize(NavigationManager.focusedPhoto.value)
+                return false
+            }
         }
             GlideInstance.loadImage(requireContext(), it, binding.image, listener)
             binding.headerTitle.text = it.photographer
         }
 
-        viewModel.wasAdded.observe(viewLifecycleOwner){
-            binding.btnAddToBookmarks.isActivated = it
-        }
+        viewModel.apply {
+            wasAdded.observe(viewLifecycleOwner){
+                binding.btnAddToBookmarks.isActivated = it
+            }
 
-        viewModel.shouldProgressBarBeVisible.observe(viewLifecycleOwner){
-            binding.apply {
-                if (it) {
-                    progressBar.progress = 0
-                    progressBar.visibility = View.VISIBLE
+            fileSizeMegaBytes.observe(viewLifecycleOwner){ sizeMegaBytes ->
+                val stringDownload = getString(R.string.download)
+                if (sizeMegaBytes != null && sizeMegaBytes != 0F){
+                    binding.tvDownload.text = "${stringDownload} (${sizeMegaBytes} Mb)"
                 }
-                else {
-                    disposable = Observable.interval(30, TimeUnit.MILLISECONDS)
-                        .takeWhile { progressBar.progress < 100 }
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(
-                            { progressBar.incrementProgressBy(10) },
-                            { throwable -> throwable.printStackTrace() },
-                            { progressBar.visibility = View.GONE }
-                        )
+                else binding.tvDownload.text = stringDownload
+            }
+
+            shouldProgressBarBeVisible.observe(viewLifecycleOwner){
+                binding.apply {
+                    if (it) {
+                        progressBar.progress = 0
+                        progressBar.visibility = View.VISIBLE
+                    }
+                    else {
+                        disposable = Observable.interval(30, TimeUnit.MILLISECONDS)
+                            .takeWhile { progressBar.progress < 100 }
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe(
+                                { progressBar.incrementProgressBy(10) },
+                                { throwable -> throwable.printStackTrace() },
+                                { progressBar.visibility = View.GONE }
+                            )
+                    }
                 }
             }
         }

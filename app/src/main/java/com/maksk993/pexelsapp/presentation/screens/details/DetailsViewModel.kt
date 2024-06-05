@@ -4,17 +4,20 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.maksk993.pexelsapp.domain.models.Photo
-import com.maksk993.pexelsapp.domain.usecases.AddPhotoToBookmarks
-import com.maksk993.pexelsapp.domain.usecases.DeletePhotoFromBookmarks
-import com.maksk993.pexelsapp.domain.usecases.WasPhotoAddedToBookmarks
+import com.maksk993.pexelsapp.domain.usecases.AddPhotoToBookmarksUseCase
+import com.maksk993.pexelsapp.domain.usecases.DeletePhotoFromBookmarksUseCase
+import com.maksk993.pexelsapp.domain.usecases.GetFileSizeOfPhotoUseCase
+import com.maksk993.pexelsapp.domain.usecases.WasPhotoAddedToBookmarksUseCase
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
+import kotlin.math.floor
 
 class DetailsViewModel(
-    private val addPhotoToBookmarks: AddPhotoToBookmarks,
-    private val wasPhotoAddedToBookmarks: WasPhotoAddedToBookmarks,
-    private val deletePhotoFromBookmarks: DeletePhotoFromBookmarks
+    private val addPhotoToBookmarksUseCase: AddPhotoToBookmarksUseCase,
+    private val wasPhotoAddedToBookmarksUseCase: WasPhotoAddedToBookmarksUseCase,
+    private val deletePhotoFromBookmarksUseCase: DeletePhotoFromBookmarksUseCase,
+    private val getFileSizeOfPhotoUseCase: GetFileSizeOfPhotoUseCase
 ) : ViewModel() {
     private val disposable = CompositeDisposable()
 
@@ -22,14 +25,14 @@ class DetailsViewModel(
     var shouldProgressBarBeVisible: LiveData<Boolean> = _shouldProgressBarBeVisible
 
     fun addPhotoToBookmarks(photo: Photo){
-        disposable.add(addPhotoToBookmarks.execute(photo)
+        disposable.add(addPhotoToBookmarksUseCase.execute(photo)
             .subscribeOn(Schedulers.io())
             .subscribe()
         )
     }
 
     fun deletePhotoFromBookmarks(photo: Photo){
-        disposable.add(deletePhotoFromBookmarks.execute(photo)
+        disposable.add(deletePhotoFromBookmarksUseCase.execute(photo)
             .subscribeOn(Schedulers.io())
             .subscribe()
         )
@@ -40,7 +43,7 @@ class DetailsViewModel(
 
     fun wasPhotoAddedToBookmarks(photo: Photo) {
         _shouldProgressBarBeVisible.value = true
-        disposable.add(wasPhotoAddedToBookmarks.execute(photo)
+        disposable.add(wasPhotoAddedToBookmarksUseCase.execute(photo)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
@@ -53,8 +56,28 @@ class DetailsViewModel(
         )
     }
 
+    private val _fileSizeMegaBytes: MutableLiveData<Float> = MutableLiveData(0F)
+    val fileSizeMegaBytes: LiveData<Float> = _fileSizeMegaBytes
+
+    fun getFileSize(photo: Photo?){
+        _fileSizeMegaBytes.value = 0F
+        photo?.let {
+            disposable.add(getFileSizeOfPhotoUseCase.execute(photo)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                    { sizeBytes ->
+                        _fileSizeMegaBytes.value = floor((sizeBytes.toFloat() / 1_000_000) * 100) / 100
+                    },
+                    { throwable -> throwable.printStackTrace() }
+                )
+            )
+        }
+    }
+
     override fun onCleared() {
         disposable.clear()
+        disposable.dispose()
         super.onCleared()
     }
 }

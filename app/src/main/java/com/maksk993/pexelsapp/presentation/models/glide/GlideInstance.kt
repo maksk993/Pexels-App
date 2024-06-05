@@ -1,4 +1,4 @@
-package com.maksk993.pexelsapp.presentation.models
+package com.maksk993.pexelsapp.presentation.models.glide
 
 import android.content.ContentValues
 import android.content.Context

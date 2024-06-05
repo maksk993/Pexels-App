@@ -2,20 +2,24 @@ package com.maksk993.pexelsapp.presentation.screens.details
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.maksk993.pexelsapp.domain.usecases.AddPhotoToBookmarks
-import com.maksk993.pexelsapp.domain.usecases.DeletePhotoFromBookmarks
-import com.maksk993.pexelsapp.domain.usecases.WasPhotoAddedToBookmarks
+import com.maksk993.pexelsapp.domain.usecases.AddPhotoToBookmarksUseCase
+import com.maksk993.pexelsapp.domain.usecases.DeletePhotoFromBookmarksUseCase
+import com.maksk993.pexelsapp.domain.usecases.GetFileSizeOfPhotoUseCase
+import com.maksk993.pexelsapp.domain.usecases.WasPhotoAddedToBookmarksUseCase
+import javax.inject.Inject
 
-class DetailsViewModelFactory(
-    private val addPhotoToBookmarks: AddPhotoToBookmarks,
-    private val wasPhotoAddedToBookmarks: WasPhotoAddedToBookmarks,
-    private val deletePhotoFromBookmarks: DeletePhotoFromBookmarks
+class DetailsViewModelFactory @Inject constructor(
+    val addPhotoToBookmarksUseCase: AddPhotoToBookmarksUseCase,
+    val wasPhotoAddedToBookmarksUseCase: WasPhotoAddedToBookmarksUseCase,
+    val deletePhotoFromBookmarksUseCase: DeletePhotoFromBookmarksUseCase,
+    val getFileSizeOfPhotoUseCase: GetFileSizeOfPhotoUseCase
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return DetailsViewModel(
-            addPhotoToBookmarks = addPhotoToBookmarks,
-            wasPhotoAddedToBookmarks = wasPhotoAddedToBookmarks,
-            deletePhotoFromBookmarks = deletePhotoFromBookmarks
+            addPhotoToBookmarksUseCase = addPhotoToBookmarksUseCase,
+            wasPhotoAddedToBookmarksUseCase = wasPhotoAddedToBookmarksUseCase,
+            deletePhotoFromBookmarksUseCase = deletePhotoFromBookmarksUseCase,
+            getFileSizeOfPhotoUseCase = getFileSizeOfPhotoUseCase
         ) as T
     }
 }

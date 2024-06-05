@@ -7,7 +7,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.widget.SearchView.OnQueryTextListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -15,16 +14,17 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.maksk993.pexelsapp.R
 import com.maksk993.pexelsapp.app.App
 import com.maksk993.pexelsapp.databinding.FragmentHomeBinding
-import com.maksk993.pexelsapp.domain.models.Collection
+import com.maksk993.pexelsapp.domain.models.FeaturedCollection
 import com.maksk993.pexelsapp.domain.models.Photo
-import com.maksk993.pexelsapp.presentation.models.recyclerview.CollectionAdapter
-import com.maksk993.pexelsapp.presentation.models.recyclerview.CollectionViewHolder
+import com.maksk993.pexelsapp.presentation.models.recyclerview.FeaturedCollectionAdapter
 import com.maksk993.pexelsapp.presentation.models.recyclerview.PhotoAdapter
+import com.maksk993.pexelsapp.presentation.models.searchview.GetSearchViewObservable
 import com.maksk993.pexelsapp.presentation.navigation.NavigationManager
 import com.maksk993.pexelsapp.presentation.navigation.Screens
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.Disposable
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.schedulers.Schedulers
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -36,11 +36,11 @@ class HomeFragment : Fragment() {
     private lateinit var binding: FragmentHomeBinding
 
     @Inject
-    lateinit var collectionAdapter: CollectionAdapter
+    lateinit var collectionAdapter: FeaturedCollectionAdapter
     @Inject
     lateinit var photoAdapter: PhotoAdapter
 
-    private lateinit var disposable: Disposable
+    private val disposables = CompositeDisposable()
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -54,8 +54,8 @@ class HomeFragment : Fragment() {
         binding = FragmentHomeBinding.inflate(inflater, container, false)
 
         initSearchView()
-        initCollectionsRv()
-        initPhotosRv()
+        initCollectionRv()
+        initPhotoRv()
         initStub()
         initNetworkStub()
 
@@ -108,7 +108,7 @@ class HomeFragment : Fragment() {
                         networkStub.visibility = View.GONE
                     }
                     else {
-                        disposable = Observable.interval(50, TimeUnit.MILLISECONDS)
+                        disposables.add(Observable.interval(50, TimeUnit.MILLISECONDS)
                             .takeWhile { progressBar.progress < 100 }
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe(
@@ -116,6 +116,7 @@ class HomeFragment : Fragment() {
                                 { throwable -> throwable.printStackTrace() },
                                 { progressBar.visibility = View.GONE }
                             )
+                        )
                     }
                 }
             }
@@ -128,74 +129,49 @@ class HomeFragment : Fragment() {
             textSize = 15F
         }
 
-        binding.searchView.setOnQueryTextListener(object : OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String?): Boolean {
-                query?.let {
-                    for (i in collectionAdapter.items.indices) {
-                        if (collectionAdapter.items[i].title == binding.searchView.query.toString()){
-                            collectionAdapter.listener.onItemClick(position = i, submit = false, setActive = true, setQuery = true)
-                        }
-                        else collectionAdapter.listener.onItemClick(position = i, submit = false, setActive = false, setQuery = false)
-                    }
-                    clearRv()
-                    if (query == "") viewModel.getPhotos()
-                    else viewModel.getPhotos(Collection(query))
-                }
-                return true
+        disposables.add(GetSearchViewObservable.execute(binding.searchView)
+            .debounce(500, TimeUnit.MILLISECONDS)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe { query ->
+                clearPhotoRv()
+                if (query == "") viewModel.getPhotos()
+                else viewModel.getPhotos(FeaturedCollection(query))
             }
-
-            override fun onQueryTextChange(newText: String?): Boolean {
-                for (i in collectionAdapter.items.indices) {
-                    if (collectionAdapter.items[i].title == binding.searchView.query.toString())
-                        return false
-                }
-                return onQueryTextSubmit(newText)
-            }
-        })
+        )
     }
 
-    private fun initPhotosRv() {
+    private fun initPhotoRv() {
         binding.rvPhotos.layoutManager = StaggeredGridLayoutManager(
             2, StaggeredGridLayoutManager.VERTICAL
         )
         photoAdapter.setVisibilityGone = true
         photoAdapter.listener = object : PhotoAdapter.OnItemClickListener{
             override fun onItemClick(position: Int) {
-                NavigationManager.setFocusedPhoto(photoAdapter.items[position])
-                NavigationManager.navigateToScreen(Screens.Details())
+                NavigationManager.navigateToScreen(
+                    screen = Screens.Details(),
+                    photo = photoAdapter.items[position]
+                )
             }
         }
         binding.rvPhotos.adapter = photoAdapter
     }
 
-    private fun initCollectionsRv() {
+    private fun initCollectionRv() {
         binding.rvCollections.layoutManager = LinearLayoutManager(
             context,
             LinearLayoutManager.HORIZONTAL,
             false
         )
-        collectionAdapter.listener = object : CollectionAdapter.OnItemClickListener{
-            override fun onItemClick(position: Int, submit: Boolean, setActive: Boolean, setQuery: Boolean) {
-                if (setQuery) binding.searchView.setQuery(collectionAdapter.items[position].title, submit)
-                val holder = binding.rvCollections.findViewHolderForAdapterPosition(position)
-                if (holder is CollectionViewHolder){
-                    if (setActive)
-                        holder.setItemColors(
-                            context?.getDrawable(R.drawable.bg_featured_collection_active),
-                            context?.getColor(R.color.white)
-                        )
-                    else
-                        holder.setItemColors(
-                            context?.getDrawable(R.drawable.bg_featured_collection_inactive),
-                            context?.getColor(R.color.black)
-                        )
-                }
+        collectionAdapter.listener = object : FeaturedCollectionAdapter.OnItemClickListener{
+            override fun onItemClick(position: Int) {
+                binding.searchView.setQuery(collectionAdapter.items[position].title, true)
             }
         }
         binding.rvCollections.adapter = collectionAdapter
     }
 
-    private fun clearRv() {
+    private fun clearPhotoRv() {
         photoAdapter.items.clear()
         photoAdapter.notifyDataSetChanged()
     }
@@ -206,7 +182,7 @@ class HomeFragment : Fragment() {
         photoAdapter.notifyItemInserted(photoAdapter.items.size)
     }
 
-    private fun addItemToFeatured(collection: Collection){
+    private fun addItemToFeatured(collection: FeaturedCollection){
         if (collectionAdapter.items.contains(collection)) return
         collectionAdapter.items.add(collection)
         collectionAdapter.notifyItemInserted(collectionAdapter.items.size)
@@ -226,13 +202,19 @@ class HomeFragment : Fragment() {
             tryAgain.setOnClickListener{
                 viewModel.getFeaturedCollections()
                 if (searchView.query.toString().isEmpty()) viewModel.getPhotos()
-                else viewModel.getPhotos(Collection(searchView.query.toString()))
+                else viewModel.getPhotos(FeaturedCollection(searchView.query.toString()))
             }
         }
     }
 
+    override fun onDestroyView() {
+        GetSearchViewObservable.shouldOnQueryTextChangeBeCalled = false
+        disposables.clear()
+        super.onDestroyView()
+    }
+
     override fun onDestroy() {
-        if (::disposable.isInitialized) disposable.dispose()
+        disposables.dispose()
         super.onDestroy()
     }
 }

@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.maksk993.pexelsapp.R
 import com.maksk993.pexelsapp.domain.models.Photo
-import com.maksk993.pexelsapp.presentation.models.GlideInstance
+import com.maksk993.pexelsapp.presentation.models.glide.GlideInstance
 import javax.inject.Inject
 
 class PhotoAdapter @Inject constructor(

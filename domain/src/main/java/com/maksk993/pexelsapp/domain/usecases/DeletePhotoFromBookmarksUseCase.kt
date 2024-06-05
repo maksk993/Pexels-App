@@ -5,6 +5,6 @@ import com.maksk993.pexelsapp.domain.repository.BookmarksRepository
 import io.reactivex.Completable
 import javax.inject.Inject
 
-class AddPhotoToBookmarks @Inject constructor(val repository: BookmarksRepository) {
-    fun execute(photo: Photo): Completable = repository.addPhoto(photo)
+class DeletePhotoFromBookmarksUseCase @Inject constructor(val repository: BookmarksRepository) {
+    fun execute(photo: Photo): Completable = repository.deletePhoto(photo)
 }

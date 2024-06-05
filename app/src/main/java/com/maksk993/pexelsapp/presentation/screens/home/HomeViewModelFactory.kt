@@ -2,17 +2,18 @@ package com.maksk993.pexelsapp.presentation.screens.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.maksk993.pexelsapp.domain.usecases.GetCuratedPhotos
-import com.maksk993.pexelsapp.domain.usecases.GetFeaturedCollections
+import com.maksk993.pexelsapp.domain.usecases.GetCuratedPhotosUseCase
+import com.maksk993.pexelsapp.domain.usecases.GetFeaturedCollectionsUseCase
+import javax.inject.Inject
 
-class HomeViewModelFactory(
-    private val getFeaturedCollections: GetFeaturedCollections,
-    private val getCuratedPhotos: GetCuratedPhotos,
+class HomeViewModelFactory @Inject constructor(
+    val getFeaturedCollectionsUseCase: GetFeaturedCollectionsUseCase,
+    val getCuratedPhotosUseCase: GetCuratedPhotosUseCase,
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return HomeViewModel(
-            getFeaturedCollections = getFeaturedCollections,
-            getCuratedPhotos = getCuratedPhotos
+            getFeaturedCollectionsUseCase = getFeaturedCollectionsUseCase,
+            getCuratedPhotosUseCase = getCuratedPhotosUseCase
         ) as T
     }
 }

@@ -5,6 +5,6 @@ import com.maksk993.pexelsapp.domain.repository.BookmarksRepository
 import io.reactivex.Single
 import javax.inject.Inject
 
-class WasPhotoAddedToBookmarks @Inject constructor(val repository: BookmarksRepository) {
+class WasPhotoAddedToBookmarksUseCase @Inject constructor(val repository: BookmarksRepository) {
     fun execute(photo: Photo): Single<Boolean> = repository.wasPhotoAdded(photo)
 }
