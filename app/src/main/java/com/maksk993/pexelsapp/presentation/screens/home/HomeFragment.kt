@@ -134,6 +134,7 @@ class HomeFragment : Fragment() {
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe { query ->
+                collectionAdapter.selectItem(query)
                 clearPhotoRv()
                 if (query == "") viewModel.getPhotos()
                 else viewModel.getPhotos(FeaturedCollection(query))

@@ -49,4 +49,26 @@ class FeaturedCollectionAdapter @Inject constructor(
         }
     }
 
+    fun selectItem(query: String){
+        if (!items.any { it.title == query }) {
+            for (i in holderMap.values) i.setItemColors(
+                backgroundColor = context.getDrawable(R.drawable.bg_featured_collection_inactive),
+                textColor = context.getColor(R.color.black)
+            )
+            selectedPosition = -1
+            return
+        }
+        for (i in items.indices){
+            if (items[i].title == query) {
+                holderMap[i]?.setItemColors(
+                    backgroundColor = context.getDrawable(R.drawable.bg_featured_collection_active),
+                    textColor = context.getColor(R.color.white)
+                )
+                selectedPosition = i
+                return
+            }
+        }
+        selectedPosition = -1
+    }
+
 }
