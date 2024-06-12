@@ -16,7 +16,7 @@ class HomeViewModel(
     private val getCuratedPhotosUseCase: GetCuratedPhotosUseCase,
 ) : ViewModel() {
 
-    private val disposable: CompositeDisposable = CompositeDisposable()
+    private val compositeDisposable: CompositeDisposable = CompositeDisposable()
 
     private var _shouldProgressBarBeVisible: MutableLiveData<Boolean> = MutableLiveData(true)
     var shouldProgressBarBeVisible: LiveData<Boolean> = _shouldProgressBarBeVisible
@@ -33,7 +33,7 @@ class HomeViewModel(
     val photos: LiveData<List<Photo>?> = _photos
 
     fun getFeaturedCollections() {
-        disposable.add(getFeaturedCollectionsUseCase.execute()
+        compositeDisposable.add(getFeaturedCollectionsUseCase.execute()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
@@ -45,7 +45,7 @@ class HomeViewModel(
 
     fun getPhotos(collection: FeaturedCollection = FeaturedCollection("Popular")){
         _shouldProgressBarBeVisible.value = true
-        disposable.add(getCuratedPhotosUseCase.execute(collection)
+        compositeDisposable.add(getCuratedPhotosUseCase.execute(collection)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
@@ -63,8 +63,8 @@ class HomeViewModel(
     }
 
     override fun onCleared() {
-        disposable.clear()
-        disposable.dispose()
+        compositeDisposable.clear()
+        compositeDisposable.dispose()
         super.onCleared()
     }
 }

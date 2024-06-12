@@ -12,7 +12,7 @@ import io.reactivex.schedulers.Schedulers
 class BookmarksViewModel(
     private val getPhotosFromBookmarksUseCase: GetPhotosFromBookmarksUseCase
 ) : ViewModel() {
-    private val disposable = CompositeDisposable()
+    private val compositeDisposable = CompositeDisposable()
 
     private val _bookmarks: MutableLiveData<List<Photo?>> = MutableLiveData(ArrayList())
     val bookmarks: LiveData<List<Photo?>> = _bookmarks
@@ -22,7 +22,7 @@ class BookmarksViewModel(
 
     fun getPhotosFromBookmarks(){
         _shouldProgressBarBeVisible.value = true
-        disposable.add(getPhotosFromBookmarksUseCase.execute()
+        compositeDisposable.add(getPhotosFromBookmarksUseCase.execute()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
@@ -36,8 +36,8 @@ class BookmarksViewModel(
     }
 
     override fun onCleared() {
-        disposable.clear()
-        disposable.dispose()
+        compositeDisposable.clear()
+        compositeDisposable.dispose()
         super.onCleared()
     }
 }

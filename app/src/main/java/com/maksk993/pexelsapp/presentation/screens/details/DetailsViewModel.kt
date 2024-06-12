@@ -19,20 +19,20 @@ class DetailsViewModel(
     private val deletePhotoFromBookmarksUseCase: DeletePhotoFromBookmarksUseCase,
     private val getFileSizeOfPhotoUseCase: GetFileSizeOfPhotoUseCase
 ) : ViewModel() {
-    private val disposable = CompositeDisposable()
+    private val compositeDisposable = CompositeDisposable()
 
     private var _shouldProgressBarBeVisible: MutableLiveData<Boolean> = MutableLiveData(true)
     var shouldProgressBarBeVisible: LiveData<Boolean> = _shouldProgressBarBeVisible
 
     fun addPhotoToBookmarks(photo: Photo){
-        disposable.add(addPhotoToBookmarksUseCase.execute(photo)
+        compositeDisposable.add(addPhotoToBookmarksUseCase.execute(photo)
             .subscribeOn(Schedulers.io())
             .subscribe()
         )
     }
 
     fun deletePhotoFromBookmarks(photo: Photo){
-        disposable.add(deletePhotoFromBookmarksUseCase.execute(photo)
+        compositeDisposable.add(deletePhotoFromBookmarksUseCase.execute(photo)
             .subscribeOn(Schedulers.io())
             .subscribe()
         )
@@ -43,7 +43,7 @@ class DetailsViewModel(
 
     fun wasPhotoAddedToBookmarks(photo: Photo) {
         _shouldProgressBarBeVisible.value = true
-        disposable.add(wasPhotoAddedToBookmarksUseCase.execute(photo)
+        compositeDisposable.add(wasPhotoAddedToBookmarksUseCase.execute(photo)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
@@ -62,7 +62,7 @@ class DetailsViewModel(
     fun getFileSize(photo: Photo?){
         _fileSizeMegaBytes.value = 0F
         photo?.let {
-            disposable.add(getFileSizeOfPhotoUseCase.execute(photo)
+            compositeDisposable.add(getFileSizeOfPhotoUseCase.execute(photo)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
@@ -76,8 +76,8 @@ class DetailsViewModel(
     }
 
     override fun onCleared() {
-        disposable.clear()
-        disposable.dispose()
+        compositeDisposable.clear()
+        compositeDisposable.dispose()
         super.onCleared()
     }
 }

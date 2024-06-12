@@ -40,7 +40,7 @@ class HomeFragment : Fragment() {
     @Inject
     lateinit var photoAdapter: PhotoAdapter
 
-    private val disposables = CompositeDisposable()
+    private val compositeDisposable = CompositeDisposable()
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -108,7 +108,7 @@ class HomeFragment : Fragment() {
                         networkStub.visibility = View.GONE
                     }
                     else {
-                        disposables.add(Observable.interval(50, TimeUnit.MILLISECONDS)
+                        compositeDisposable.add(Observable.interval(50, TimeUnit.MILLISECONDS)
                             .takeWhile { progressBar.progress < 100 }
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe(
@@ -129,7 +129,7 @@ class HomeFragment : Fragment() {
             textSize = 15F
         }
 
-        disposables.add(GetSearchViewObservable.execute(binding.searchView)
+        compositeDisposable.add(GetSearchViewObservable.execute(binding.searchView)
             .debounce(500, TimeUnit.MILLISECONDS)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
@@ -210,12 +210,12 @@ class HomeFragment : Fragment() {
 
     override fun onDestroyView() {
         GetSearchViewObservable.shouldOnQueryTextChangeBeCalled = false
-        disposables.clear()
+        compositeDisposable.clear()
         super.onDestroyView()
     }
 
     override fun onDestroy() {
-        disposables.dispose()
+        compositeDisposable.dispose()
         super.onDestroy()
     }
 }
